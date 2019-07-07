@@ -1,0 +1,24 @@
+{
+    "name": "easy-doc/easy-doc",
+    "description": "An easy way to generate a static website from HTML/Markdown/RST/Pug/anything sources",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "KyleK",
+            "email": "kylekatarnls@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1 || ^8.0",
+        "simple-cli/simple-cli": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "EasyDoc\\": "src/EasyDoc/"
+        }
+    },
+    "bin": [
+        "bin/easy-doc"
+    ]
+}
