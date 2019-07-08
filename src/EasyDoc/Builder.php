@@ -30,13 +30,50 @@ class Builder
         ], $extensions) as $extension => $transformation) {
             if (is_int($extension)) {
                 $extension = $transformation;
-                $transformation = function ($text) {
-                    return $text;
-                };
+                $transformation = 'file_get_contents';
+            }
+
+            if ($transformation === 'file_eval') {
+                $transformation = [$this, 'evaluatePhpFile'];
             }
 
             $this->extensions[strtolower($extension)] = $transformation;
         }
+    }
+
+    /**
+     * Build the website directory and create HTML files from RST sources.
+     *
+     * @param string   $websiteDirectory Output directory
+     * @param string   $rstDir           Directory containing .rst files
+     * @param string   $baseHref         Base of link to be used if website is deployed in a folder URI
+     *
+     * @return void
+     */
+    public function build($websiteDirectory, $rstDir, $baseHref)
+    {
+        $this->removeDirectory($websiteDirectory);
+        @mkdir($websiteDirectory, 0777, true);
+        $this->copyDirectory(__DIR__.'/../src/site/resources/web', $websiteDirectory);
+        $this->buildWebsite($rstDir, $parser, $websiteDirectory, $changelogContent, $rstDir, $baseHref);
+        copy($websiteDirectory.'/about.html', $websiteDirectory.'/index.html');
+    }
+
+    /**
+     * Include a PHP file and returns the output buffered.
+     *
+     * @param string $file
+     *
+     * @return string
+     */
+    protected function evaluatePhpFile(string $file): string
+    {
+        ob_start();
+        include $file;
+        $html = ob_get_contents();
+        ob_end_clean();
+
+        return $html;
     }
 
     /**
@@ -102,18 +139,17 @@ class Builder
     }
 
     /**
-     * Create a HTML files from RST sources.
+     * Create HTML files from RST sources.
      *
      * @param string   $dir
      * @param string   $websiteDirectory Output directory
-     * @param string   $changelogContent Content of the CHANGELOG file
      * @param string   $rstDir           Directory containing .rst files
      * @param string   $baseHref         Base of link to be used if website is deployed in a folder URI
      * @param string   $base             Base path for recursion
      *
      * @return void
      */
-    public function buildWebsite($dir, $websiteDirectory, $changelogContent, $rstDir, $baseHref, $base = '')
+    protected function buildWebsite($dir, $websiteDirectory, $rstDir, $baseHref, $base = '')
     {
         foreach (scandir($dir) as $item) {
             if (substr($item, 0, 1) === '.') {
@@ -121,7 +157,7 @@ class Builder
             }
 
             if (is_dir($dir.'/'.$item)) {
-                $this->buildWebsite($dir.'/'.$item, $websiteDirectory, $changelogContent, $rstDir, $baseHref, $base.'/'.$item);
+                $this->buildWebsite($dir.'/'.$item, $websiteDirectory, $rstDir, $baseHref, $base.'/'.$item);
 
                 continue;
             }
@@ -139,17 +175,12 @@ class Builder
                 mkdir($directory, 0777, true);
             }
 
-            $content = $transformation(file_get_contents($dir.'/'.$item));
+            $content = $transformation($dir.'/'.$item);
             $uri = $base.'/'.substr($item, 0, -4).'.html';
 
             $menu = $this->buildMenu($uri, $rstDir, $baseHref);
 
-            ob_start();
-            include $this->layout;
-            $html = ob_get_contents();
-            ob_end_clean();
-
-            file_put_contents($websiteDirectory.$uri, $html);
+            file_put_contents($websiteDirectory.$uri, $this->evaluatePhpFile($this->layout));
         }
     }
 
