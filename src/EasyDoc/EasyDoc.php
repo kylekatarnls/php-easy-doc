@@ -2,9 +2,11 @@
 
 namespace EasyDoc;
 
+use EasyDoc\Command\Build;
+use SimpleCli\SimpleCli;
 use SimpleXMLElement;
 
-class Builder
+class EasyDoc extends SimpleCli
 {
     /**
      * @var string
@@ -17,13 +19,19 @@ class Builder
     protected $extensions = [];
 
     /**
-     * Builder constructor.
-     *
-     * @param array $extensions
+     * @param string $layout
      */
-    public function __construct(string $layout, array $extensions = [])
+    public function setLayout(string $layout)
     {
         $this->layout = $layout;
+    }
+
+    /**
+     * @param array $extensions
+     */
+    public function setExtensions(array $extensions)
+    {
+        $this->extensions = [];
 
         foreach (array_merge([
             'html',
@@ -55,7 +63,7 @@ class Builder
         $this->removeDirectory($websiteDirectory);
         @mkdir($websiteDirectory, 0777, true);
         $this->copyDirectory(__DIR__.'/../src/site/resources/web', $websiteDirectory);
-        $this->buildWebsite($rstDir, $parser, $websiteDirectory, $changelogContent, $rstDir, $baseHref);
+        $this->buildWebsite($rstDir, $websiteDirectory, $rstDir, $baseHref);
         copy($websiteDirectory.'/about.html', $websiteDirectory.'/index.html');
     }
 
@@ -359,5 +367,12 @@ class Builder
         return file_exists($rstDir.'/.index.php')
             ? $this->buildPhpMenu($uri, $rstDir, $baseHref)
             : $this->buildXmlMenu($uri, $rstDir, $baseHref);
+    }
+
+    public function getCommands(): array
+    {
+        return [
+            'build' => Build::class,
+        ];
     }
 }

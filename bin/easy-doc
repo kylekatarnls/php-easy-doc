@@ -18,4 +18,4 @@ if (!file_exists($dir.'/autoload.php')) {
 
 include $dir.'/autoload.php';
 
-exit((new \EasyDoc\EasyDocCli())(...$argv) ? 0 : 1);
+exit((new \EasyDoc\EasyDoc())(...$argv) ? 0 : 1);

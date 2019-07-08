@@ -3,8 +3,11 @@
 namespace EasyDoc\Command;
 
 use EasyDoc\Builder;
+use EasyDoc\EasyDoc;
 use SimpleCli\Command;
 use SimpleCli\Options\Help;
+use SimpleCli\Options\Quiet;
+use SimpleCli\Options\Verbose;
 use SimpleCli\SimpleCli;
 
 /**
@@ -12,7 +15,12 @@ use SimpleCli\SimpleCli;
  */
 class Build implements Command
 {
-    use Help;
+    use Help, Quiet, Verbose;
+
+    /**
+     * @var EasyDoc
+     */
+    protected $cli;
 
     /**
      * @var array
@@ -30,13 +38,16 @@ class Build implements Command
 
     public function run(SimpleCli $cli): bool
     {
+        $this->cli = $cli;
+        $this->cli->setLayout($this->config['layout'] ?? 'doc/layout.php');
+        $this->cli->setExtensions($this->config['extensions'] ?? []);
         $this->config = include $this->configFile;
 
         $websiteDirectory = $this->config['websiteDirectory'] ?? 'dist/website';
         $sourceDir = $this->config['sourceDir'] ?? 'doc';
         $baseHref = $this->config['baseHref'] ?? '';
 
-        (new Builder())->build($websiteDirectory, $sourceDir, $baseHref);
+        $this->cli->build($websiteDirectory, $sourceDir, $baseHref);
 
         if ($cname = $this->config['cname'] ?? '') {
             file_put_contents($websiteDirectory.'/CNAME', $cname);
