@@ -9,15 +9,6 @@
             "email": "kylekatarnls@gmail.com"
         }
     ],
-    "require": {
-        "php": "^7.1 || ^8.0",
-        "simple-cli/simple-cli": "^1.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "EasyDoc\\": "src/EasyDoc/"
-        }
-    },
     "bin": [
         "bin/easy-doc"
     ]

@@ -1,21 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-$dir = __DIR__.'/..';
+echo 'easy-doc can only be executed with PHP 7.1+';
 
-if (!file_exists($dir.'/autoload.php')) {
-    $dir = __DIR__.'/../vendor';
-}
-
-if (!file_exists($dir.'/autoload.php')) {
-    $dir = __DIR__.'/../../..';
-}
-
-if (!file_exists($dir.'/autoload.php')) {
-    echo 'Autoload not found.';
-    exit(1);
-}
-
-include $dir.'/autoload.php';
-
-exit((new \EasyDoc\EasyDocCli())(...$argv) ? 0 : 1);
+exit(1);
