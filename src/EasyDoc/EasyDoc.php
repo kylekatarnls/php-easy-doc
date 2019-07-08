@@ -3,11 +3,14 @@
 namespace EasyDoc;
 
 use EasyDoc\Command\Build;
+use SimpleCli\Options\Verbose;
 use SimpleCli\SimpleCli;
 use SimpleXMLElement;
 
 class EasyDoc extends SimpleCli
 {
+    use Verbose;
+
     /**
      * @var string
      */
@@ -17,6 +20,22 @@ class EasyDoc extends SimpleCli
      * @var array
      */
     protected $extensions = [];
+
+    /**
+     * @param bool $verbose
+     */
+    public function setVerbose(bool $verbose)
+    {
+        $this->verbose = $verbose;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVerbose(): bool
+    {
+        return $this->verbose;
+    }
 
     /**
      * @param string $layout
@@ -53,18 +72,44 @@ class EasyDoc extends SimpleCli
      * Build the website directory and create HTML files from RST sources.
      *
      * @param string   $websiteDirectory Output directory
-     * @param string   $rstDir           Directory containing .rst files
+     * @param string   $assetsDirectory  Directory with static assets
+     * @param string   $sourceDirectory  Directory containing .rst files
      * @param string   $baseHref         Base of link to be used if website is deployed in a folder URI
+     * @param string   $index            Optional index file to be copied as index.html after the build
      *
      * @return void
      */
-    public function build($websiteDirectory, $rstDir, $baseHref)
+    public function build(string $websiteDirectory, string $assetsDirectory, string $sourceDirectory, string $baseHref, string $index = null): void
     {
+        $this->info("Initializing $websiteDirectory");
         $this->removeDirectory($websiteDirectory);
         @mkdir($websiteDirectory, 0777, true);
-        $this->copyDirectory(__DIR__.'/../src/site/resources/web', $websiteDirectory);
-        $this->buildWebsite($rstDir, $websiteDirectory, $rstDir, $baseHref);
-        copy($websiteDirectory.'/about.html', $websiteDirectory.'/index.html');
+
+        $this->info('Copying assets from '.var_export($assetsDirectory, true));
+        @is_dir($assetsDirectory)
+            ? $this->copyDirectory($assetsDirectory, $websiteDirectory)
+            : $this->info('assets directory skipped as empty');
+
+        $this->writeLine('Building website from '.var_export($sourceDirectory, true), 'light_cyan');
+        @is_dir($sourceDirectory)
+            ? $this->buildWebsite($sourceDirectory, $websiteDirectory, $sourceDirectory, $baseHref)
+            : $this->info('source directory skipped as empty');
+
+        if ($index) {
+            $source = $websiteDirectory.'/'.$index;
+            $destination = $websiteDirectory.'/index.html';
+            $this->info("Copying $source to $destination");
+            @copy($source, $destination);
+        }
+
+        $this->writeLine('Build finished.');
+    }
+
+    protected function info(string $message): void
+    {
+        if ($this->isVerbose()) {
+            $this->writeLine($message, 'cyan');
+        }
     }
 
     /**
@@ -151,13 +196,13 @@ class EasyDoc extends SimpleCli
      *
      * @param string   $dir
      * @param string   $websiteDirectory Output directory
-     * @param string   $rstDir           Directory containing .rst files
+     * @param string   $sourceDirectory  Directory containing .rst files
      * @param string   $baseHref         Base of link to be used if website is deployed in a folder URI
      * @param string   $base             Base path for recursion
      *
      * @return void
      */
-    protected function buildWebsite($dir, $websiteDirectory, $rstDir, $baseHref, $base = '')
+    protected function buildWebsite($dir, $websiteDirectory, $sourceDirectory, $baseHref, $base = '')
     {
         foreach (scandir($dir) as $item) {
             if (substr($item, 0, 1) === '.') {
@@ -165,7 +210,7 @@ class EasyDoc extends SimpleCli
             }
 
             if (is_dir($dir.'/'.$item)) {
-                $this->buildWebsite($dir.'/'.$item, $websiteDirectory, $rstDir, $baseHref, $base.'/'.$item);
+                $this->buildWebsite($dir.'/'.$item, $websiteDirectory, $sourceDirectory, $baseHref, $base.'/'.$item);
 
                 continue;
             }
@@ -186,7 +231,7 @@ class EasyDoc extends SimpleCli
             $content = $transformation($dir.'/'.$item);
             $uri = $base.'/'.substr($item, 0, -4).'.html';
 
-            $menu = $this->buildMenu($uri, $rstDir, $baseHref);
+            $menu = $this->buildMenu($uri, $sourceDirectory, $baseHref);
 
             file_put_contents($websiteDirectory.$uri, $this->evaluatePhpFile($this->layout));
         }
@@ -231,16 +276,16 @@ class EasyDoc extends SimpleCli
     /**
      * Return the menu as HTML from raw PHP array definition.
      *
-     * @param string $uri      URI of the current page
-     * @param string $rstDir   Directory containing .rst files
-     * @param string $baseHref Base of link to be used if website is deployed in a folder URI
+     * @param string $uri             URI of the current page
+     * @param string $sourceDirectory Directory containing .rst files
+     * @param string $baseHref        Base of link to be used if website is deployed in a folder URI
      *
      * @return string
      */
-    protected function buildPhpMenu(string $uri, string $rstDir, string $baseHref): string
+    protected function buildPhpMenu(string $uri, string $sourceDirectory, string $baseHref): string
     {
         $output = '';
-        $menu = include $rstDir.'/.index.php';
+        $menu = include $sourceDirectory.'/.index.php';
 
         foreach ($menu as $node) {
             if (!isset($node['path'], $node['name']) || ($node['hidden'] ?? false)) {
@@ -260,7 +305,7 @@ class EasyDoc extends SimpleCli
             $output .= $selected ? '<strong>'.$name.'</strong>' : $name;
             $output .= '</a>';
 
-            if ($selected && $isDirectory && file_exists($file = $rstDir.'/'.$path.'.index.php')) {
+            if ($selected && $isDirectory && file_exists($file = $sourceDirectory.'/'.$path.'.index.php')) {
                 $upperPath = $path;
                 $subMenu = include $file;
 
@@ -293,16 +338,16 @@ class EasyDoc extends SimpleCli
     /**
      * Return the menu as HTML from XML definition.
      *
-     * @param string $uri      URI of the current page
-     * @param string $rstDir   Directory containing .rst files
-     * @param string $baseHref Base of link to be used if website is deployed in a folder URI
+     * @param string $uri             URI of the current page
+     * @param string $sourceDirectory Directory containing .rst files
+     * @param string $baseHref        Base of link to be used if website is deployed in a folder URI
      *
      * @return string
      */
-    protected function buildXmlMenu(string $uri, string $rstDir, string $baseHref): string
+    protected function buildXmlMenu(string $uri, string $sourceDirectory, string $baseHref): string
     {
         $output = '';
-        $menu = simplexml_load_file($rstDir.'/.index.xml');
+        $menu = simplexml_load_file($sourceDirectory.'/.index.xml');
 
         foreach ($menu->children() as $node) {
             $path = $node->xpath('path');
@@ -323,7 +368,7 @@ class EasyDoc extends SimpleCli
             $output .= $selected ? '<strong>'.$name.'</strong>' : $name;
             $output .= '</a>';
 
-            if ($selected && $isDirectory && file_exists($file = $rstDir.'/'.$path.'.index.xml')) {
+            if ($selected && $isDirectory && file_exists($file = $sourceDirectory.'/'.$path.'.index.xml')) {
                 $upperPath = $path;
                 $subMenu = simplexml_load_file($file);
 
@@ -356,17 +401,17 @@ class EasyDoc extends SimpleCli
     /**
      * Return the menu as HTML.
      *
-     * @param string $uri      URI of the current page
-     * @param string $rstDir   Directory containing .rst files
-     * @param string $baseHref Base of link to be used if website is deployed in a folder URI
+     * @param string $uri             URI of the current page
+     * @param string $sourceDirectory Directory containing .rst files
+     * @param string $baseHref        Base of link to be used if website is deployed in a folder URI
      *
      * @return string
      */
-    protected function buildMenu(string $uri, string $rstDir, string $baseHref): string
+    protected function buildMenu(string $uri, string $sourceDirectory, string $baseHref): string
     {
-        return file_exists($rstDir.'/.index.php')
-            ? $this->buildPhpMenu($uri, $rstDir, $baseHref)
-            : $this->buildXmlMenu($uri, $rstDir, $baseHref);
+        return file_exists($sourceDirectory.'/.index.php')
+            ? $this->buildPhpMenu($uri, $sourceDirectory, $baseHref)
+            : $this->buildXmlMenu($uri, $sourceDirectory, $baseHref);
     }
 
     public function getCommands(): array

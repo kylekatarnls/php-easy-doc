@@ -38,22 +38,23 @@ class Build implements Command
 
     public function run(SimpleCli $cli): bool
     {
-        $this->cli = $cli;
-        $this->cli->setLayout($this->config['layout'] ?? 'doc/layout.php');
-        $this->cli->setExtensions($this->config['extensions'] ?? []);
         $this->config = include $this->configFile;
 
         $websiteDirectory = $this->config['websiteDirectory'] ?? 'dist/website';
-        $sourceDir = $this->config['sourceDir'] ?? 'doc';
+        $assetsDirectory = $this->config['assetsDirectory'] ?? "$websiteDirectory/assets";
+        $sourceDir = $this->config['sourceDirectory'] ?? 'doc';
         $baseHref = $this->config['baseHref'] ?? '';
 
-        $this->cli->build($websiteDirectory, $sourceDir, $baseHref);
+        $this->cli = $cli;
+        $this->cli->setLayout($this->config['layout'] ?? "$sourceDir/layout.php");
+        $this->cli->setExtensions($this->config['extensions'] ?? []);
+        $this->cli->setVerbose($this->verbose);
+
+        $this->cli->build($websiteDirectory, $assetsDirectory, $sourceDir, $baseHref, $this->config['index'] ?? null);
 
         if ($cname = $this->config['cname'] ?? '') {
             file_put_contents($websiteDirectory.'/CNAME', $cname);
         }
-
-        $cli->write($this->configFile, 'red');
 
         return true;
     }
