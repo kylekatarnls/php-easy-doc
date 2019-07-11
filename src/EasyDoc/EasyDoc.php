@@ -232,8 +232,9 @@ class EasyDoc extends SimpleCli
             $uri = $base.'/'.substr($item, 0, -4).'.html';
 
             $menu = $this->buildMenu($uri, $sourceDirectory, $baseHref);
+            $layout = file_exists($this->layout) ? $this->layout : __DIR__.'/defaultLayout.php';
 
-            file_put_contents($websiteDirectory.$uri, $this->evaluatePhpFile($this->layout));
+            file_put_contents($websiteDirectory.$uri, $this->evaluatePhpFile($layout));
         }
     }
 
@@ -409,9 +410,15 @@ class EasyDoc extends SimpleCli
      */
     protected function buildMenu(string $uri, string $sourceDirectory, string $baseHref): string
     {
-        return file_exists($sourceDirectory.'/.index.php')
-            ? $this->buildPhpMenu($uri, $sourceDirectory, $baseHref)
-            : $this->buildXmlMenu($uri, $sourceDirectory, $baseHref);
+        if (file_exists($sourceDirectory.'/.index.php')) {
+            return $this->buildPhpMenu($uri, $sourceDirectory, $baseHref);
+        }
+
+        if (file_exists($sourceDirectory.'/.index.xml')) {
+            return $this->buildXmlMenu($uri, $sourceDirectory, $baseHref);
+        }
+
+        return '<!-- Menu index not found. -->';
     }
 
     public function getCommands(): array
