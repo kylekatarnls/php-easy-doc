@@ -38,7 +38,7 @@ class Build implements Command
 
     public function run(SimpleCli $cli): bool
     {
-        $this->config = include $this->configFile;
+        $this->config = file_exists($this->configFile) ? include $this->configFile : [];
 
         $websiteDirectory = $this->config['websiteDirectory'] ?? 'dist/website';
         $assetsDirectory = $this->config['assetsDirectory'] ?? "$websiteDirectory/assets";
