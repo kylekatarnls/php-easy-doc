@@ -216,7 +216,8 @@ class EasyDoc extends SimpleCli
             }
 
             $parts = explode('.', $item);
-            $transformation = count($parts) < 2 ? null : ($this->extensions[strtolower(end($parts))] ?? null);
+            $extension = strtolower(end($parts));
+            $transformation = count($parts) < 2 ? null : ($this->extensions[$extension] ?? null);
 
             if (!$transformation) {
                 continue;
@@ -229,7 +230,7 @@ class EasyDoc extends SimpleCli
             }
 
             $content = $transformation($dir.'/'.$item);
-            $uri = $base.'/'.substr($item, 0, -4).'.html';
+            $uri = $base.'/'.substr($item, 0, -strlen($extension) - 1).'.html';
 
             $menu = $this->buildMenu($uri, $sourceDirectory, $baseHref);
             $layout = file_exists($this->layout) ? $this->layout : __DIR__.'/defaultLayout.php';
