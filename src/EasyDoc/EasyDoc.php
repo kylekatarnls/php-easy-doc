@@ -105,7 +105,12 @@ class EasyDoc extends SimpleCli
         $this->writeLine('Build finished.');
     }
 
-    protected function info(string $message): void
+    /**
+     * Display message in cyan if verbose mode is on.
+     *
+     * @param string $message
+     */
+    public function info(string $message): void
     {
         if ($this->isVerbose()) {
             $this->writeLine($message, 'cyan');
@@ -119,8 +124,10 @@ class EasyDoc extends SimpleCli
      *
      * @return string
      */
-    protected function evaluatePhpFile(string $file): string
+    protected function evaluatePhpFile(string $file, array $locals = []): string
     {
+        extract($locals);
+
         ob_start();
         include $file;
         $html = ob_get_contents();
@@ -235,7 +242,10 @@ class EasyDoc extends SimpleCli
             $menu = $this->buildMenu($uri, $sourceDirectory, $baseHref);
             $layout = file_exists($this->layout) ? $this->layout : __DIR__.'/defaultLayout.php';
 
-            file_put_contents($websiteDirectory.$uri, $this->evaluatePhpFile($layout));
+            file_put_contents($websiteDirectory.$uri, $this->evaluatePhpFile($layout, [
+                'content' => $content,
+                'menu' => $menu,
+            ]));
         }
     }
 

@@ -17,6 +17,8 @@ class Build implements Command
 {
     use Help, Quiet, Verbose;
 
+    const DEFAULT_CONFIG_FILE = '.easy-doc.php';
+
     /**
      * @var EasyDoc
      */
@@ -34,18 +36,21 @@ class Build implements Command
      *
      * @var string
      */
-    public $configFile = '.easy-doc.php';
+    public $configFile = self::DEFAULT_CONFIG_FILE;
 
     public function run(SimpleCli $cli): bool
     {
-        $this->config = file_exists($this->configFile) ? include $this->configFile : [];
+        $this->cli = $cli;
+
+        if (!$this->handleConfigFile()) {
+            return false;
+        }
 
         $websiteDirectory = $this->config['websiteDirectory'] ?? 'dist/website';
         $assetsDirectory = $this->config['assetsDirectory'] ?? "$websiteDirectory/assets";
         $sourceDir = $this->config['sourceDirectory'] ?? 'doc';
         $baseHref = $this->config['baseHref'] ?? '';
 
-        $this->cli = $cli;
         $this->cli->setLayout($this->config['layout'] ?? "$sourceDir/layout.php");
         $this->cli->setExtensions($this->config['extensions'] ?? []);
         $this->cli->setVerbose($this->verbose);
@@ -54,6 +59,28 @@ class Build implements Command
 
         if ($cname = $this->config['cname'] ?? '') {
             file_put_contents($websiteDirectory.'/CNAME', $cname);
+        }
+
+        return true;
+    }
+
+    protected function handleConfigFile()
+    {
+        if ($this->configFile) {
+            if (!file_exists($this->configFile)) {
+                if ($this->configFile !== self::DEFAULT_CONFIG_FILE) {
+                    $this->cli->writeLine('Config file not found', 'light_red');
+                    $this->cli->write(strval($this->configFile), 'red');
+
+                    return false;
+                }
+
+                $this->cli->info('Config file not found, fallback to default config.');
+
+                return true;
+            }
+
+            $this->config = include $this->configFile;
         }
 
         return true;
