@@ -245,6 +245,8 @@ class EasyDoc extends SimpleCli
             file_put_contents($websiteDirectory.$uri, $this->evaluatePhpFile($layout, [
                 'content' => $content,
                 'menu' => $menu,
+                'uri' => $uri,
+                'baseHref' => $baseHref,
             ]));
         }
     }
