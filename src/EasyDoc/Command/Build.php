@@ -4,6 +4,7 @@ namespace EasyDoc\Command;
 
 use EasyDoc\Builder;
 use EasyDoc\EasyDoc;
+use EasyDoc\Util\PharPublish;
 use SimpleCli\Command;
 use SimpleCli\Options\Help;
 use SimpleCli\Options\Quiet;
@@ -54,6 +55,14 @@ class Build implements Command
         $this->cli->setLayout($this->config['layout'] ?? "$sourceDir/layout.php");
         $this->cli->setExtensions($this->config['extensions'] ?? []);
         $this->cli->setVerbose($this->verbose);
+
+        if (isset($this->config['publishPhar'])) {
+            $config = is_string($this->config['publishPhar'])
+                ? ['repository' => $this->config['publishPhar']]
+                : $this->config['publishPhar'];
+            $publishPhar = new PharPublish($config['repository'], $config['directory'] ?? $websiteDirectory.'/static/');
+            $publishPhar->publishPhar();
+        }
 
         $this->cli->build($websiteDirectory, $assetsDirectory, $sourceDir, $baseHref, $this->config['index'] ?? null);
 
