@@ -22,7 +22,7 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
   - composer self-update
-  - if [[ $WEBSITE = 'true' ]]; then composer require cebe/markdown --no-update; fi
+  - if [[ $WEBSITE = 'true' ]]; then composer require erusev/parsedown --no-update; fi
   - composer install
 
 script:

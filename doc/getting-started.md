@@ -104,7 +104,7 @@ return [
     'assetsDirectory' => __DIR__.'/assets',
     'layout' => __DIR__.'/layout.php',
     'extensions' => [
-        'md' => function ($file) use ($parser) {
+        'rst' => function ($file) use ($parser) {
             return $parser->parseFile($file);
         },
     ],
@@ -133,7 +133,7 @@ return [
     'assetsDirectory' => __DIR__.'/assets',
     'layout' => __DIR__.'/layout.php',
     'extensions' => [
-        'md' => function ($file) use ($parser) {
+        'pug' => function ($file) use ($parser) {
             return Facade::renderFile($file);
         },
     ],
