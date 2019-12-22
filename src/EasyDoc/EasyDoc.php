@@ -312,7 +312,7 @@ class EasyDoc extends SimpleCli
             $name = htmlspecialchars(is_string($name) ? $name : strval($name[0]));
             $path = ltrim(strval(is_string($path) ? $path : $path[0]), '/');
             $href = '/'.$path;
-            $root = $isDirectory ? $href : pathinfo($href, PATHINFO_FILENAME).'.html';
+            $root = $isDirectory ? $href : $this->trimExtension($href).'.html';
             $href = $isDirectory ? $href.'index.html' : $root;
             $selected = substr($uri, 0, strlen($root)) === $root;
             $output .= '<li><a href="'.$baseHref.$href.'" title="'.$name.'">';
@@ -330,10 +330,10 @@ class EasyDoc extends SimpleCli
                         continue;
                     }
 
-                    $isDirectory = $node['directory'] ?? false;
+                    $isDirectory = $subNode['directory'] ?? false;
                     $name = htmlspecialchars(strval($subNode['name'] ?? 'unknown'));
                     $href = '/'.$upperPath.ltrim(strval($subNode['path'] ?? 'unknown'), '/');
-                    $root = $isDirectory ? $href : substr($href, 0, -4).'.html';
+                    $root = $isDirectory ? $href : $this->trimExtension($href).'.html';
                     $href = $isDirectory ? $href.'index.html' : $root;
                     $output .= '<li><a href="'.$baseHref.$href.'" title="'.$name.'">';
                     $output .= substr($uri, 0, strlen($root)) === $root ? '<strong>'.$name.'</strong>' : $name;
@@ -375,7 +375,7 @@ class EasyDoc extends SimpleCli
             $name = htmlspecialchars(strval($name[0]));
             $path = ltrim(strval($path[0]), '/');
             $href = '/'.$path;
-            $root = $isDirectory ? $href : substr($href, 0, -4).'.html';
+            $root = $isDirectory ? $href : $this->trimExtension($href).'.html';
             $href = $isDirectory ? $href.'index.html' : $root;
             $selected = substr($uri, 0, strlen($root)) === $root;
             $output .= '<li><a href="'.$baseHref.$href.'" title="'.$name.'">';
@@ -396,7 +396,7 @@ class EasyDoc extends SimpleCli
                     $isDirectory = $subNode->getName() === 'directory';
                     $name = htmlspecialchars(strval($subNode->xpath('name')[0] ?? 'unknown'));
                     $href = '/'.$upperPath.ltrim(strval($subNode->xpath('path')[0] ?? 'unknown'), '/');
-                    $root = $isDirectory ? $href : substr($href, 0, -4).'.html';
+                    $root = $isDirectory ? $href : $this->trimExtension($href).'.html';
                     $href = $isDirectory ? $href.'index.html' : $root;
                     $output .= '<li><a href="'.$baseHref.$href.'" title="'.$name.'">';
                     $output .= substr($uri, 0, strlen($root)) === $root ? '<strong>'.$name.'</strong>' : $name;
@@ -410,6 +410,23 @@ class EasyDoc extends SimpleCli
         }
 
         return $output;
+    }
+
+    /**
+     * Return a path trimmed from its extension.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function trimExtension(string $path): string
+    {
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+
+        if (empty($extension)) {
+            return $path;
+        }
+
+        return substr($path, 0, -1 - strlen($extension));
     }
 
     /**

@@ -61,6 +61,10 @@ a {
     padding-inline-start: 0;
 }
 
+#content > aside ul li ul {
+    padding-left: 20px;
+}
+
 #content > aside ul a {
     padding: 4px;
     display: block;

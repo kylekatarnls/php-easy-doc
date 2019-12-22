@@ -6,6 +6,8 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="Stylesheet" type="text/css" href="<?php echo $baseHref ?? ''; ?>/css/layout.css" media="screen">
+    <link rel="icon" href="<?php echo $baseHref ?? ''; ?>/favicon.ico" type="image/x-icon" />
+
     <title>Easy-Doc</title>
 </head>
 <body>

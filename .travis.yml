@@ -27,7 +27,7 @@ before_script:
   - if [[ $TRAVIS_PHP_VERSION != 'nightly' ]]; then composer update; fi;
 
 script:
-  - if [[ $WEBSITE = 'true' ]]; then php bin/easy-doc build doc/config.php --verbose; fi
+  - if [[ $WEBSITE = 'true' ]]; then php bin/easy-doc build --verbose; fi
   - if [[ $WEBSITE != 'true' ]]; then vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml; fi
 
 after_script:

@@ -1,12 +1,20 @@
-<?php
+# Markdown
 
-use EasyDoc\Util\EnvVar;
+Install a Markdown parser, for example:
+
+```shell
+composer require --dev erusev/parsedown
+```
+
+And add `.md` parsing in the `'extensions'` config:
+
+```php
+<?php
 
 $parser = new Parsedown();
 
 return [
-    'baseHref' => EnvVar::toString('BASE_HREF'),
-    'index' => 'getting-started.html',
+    'index' => '/',
     'websiteDirectory' => __DIR__.'/../dist/website',
     'sourceDirectory' => __DIR__,
     'assetsDirectory' => __DIR__.'/assets',
@@ -17,3 +25,4 @@ return [
         },
     ],
 ];
+```

@@ -2,7 +2,6 @@
 
 namespace EasyDoc\Command;
 
-use EasyDoc\Builder;
 use EasyDoc\EasyDoc;
 use EasyDoc\Util\PharPublish;
 use SimpleCli\Command;

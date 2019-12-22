@@ -12,7 +12,9 @@ class EnvVar
 
         if ($settings === null) {
             $settings = file_exists('.env') ? parse_ini_file('.env') : [];
-            echo (file_exists('.env') ? '.env file loaded: '.var_export(array_keys($settings), true) : 'no .env file.')."\n";
+            echo (file_exists('.env') ? '.env file loaded: '.implode('', array_map(function ($key) {
+                return "\n - $key";
+            }, array_keys($settings))) : 'no .env file.')."\n";
         }
 
         $this->value = getenv($var);
