@@ -15,6 +15,7 @@ class Http
 
         if ($file !== null) {
             $file = fopen($file, 'w');
+
             if ($file !== false) {
                 curl_setopt($curl, CURLOPT_FILE, $file);
             }
@@ -47,7 +48,7 @@ class Http
 
         curl_close($curl);
 
-        if ($file !== false) {
+        if (is_resource($file)) {
             fclose($file);
         }
 

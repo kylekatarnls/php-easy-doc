@@ -309,10 +309,10 @@ class EasyDoc extends SimpleCli
             $path = $node['path'];
             $name = $node['name'];
             $isDirectory = $node['directory'] ?? false;
-            $name = htmlspecialchars(strval($name[0]));
-            $path = ltrim(strval($path[0]), '/');
+            $name = htmlspecialchars(is_string($name) ? $name : strval($name[0]));
+            $path = ltrim(strval(is_string($path) ? $path : $path[0]), '/');
             $href = '/'.$path;
-            $root = $isDirectory ? $href : substr($href, 0, -4).'.html';
+            $root = $isDirectory ? $href : pathinfo($href, PATHINFO_FILENAME).'.html';
             $href = $isDirectory ? $href.'index.html' : $root;
             $selected = substr($uri, 0, strlen($root)) === $root;
             $output .= '<li><a href="'.$baseHref.$href.'" title="'.$name.'">';

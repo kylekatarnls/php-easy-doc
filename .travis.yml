@@ -1,0 +1,46 @@
+language: php
+
+matrix:
+  include:
+    - php: 7.1
+    - php: 7.2
+    - php: 7.3
+    - php: 7.4
+    - php: nigthly
+    - php: 7.4
+      env: WEBSITE=true
+
+sudo: false
+
+env:
+  global:
+    - WEBSITE=false
+    - CC_TEST_REPORTER_ID=298bdec6344bc69dfae3daf835a94e21c1dc3b00bfe7fae7cdaa3575b1bfea3e
+
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+  - composer self-update
+  - if [[ $WEBSITE = 'true' ]]; then composer require cebe/markdown --no-update; fi
+  - composer install
+
+script:
+  - if [[ $WEBSITE = 'true' ]]; then easy-doc build doc/config.php --verbose; fi
+  - if [[ $WEBSITE != 'true' ]]; then vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml; fi
+
+after_script:
+  - cp coverage.xml clover.xml
+  - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  - provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    local_dir: dist/website
+    on:
+      branch: master
+      condition: $WEBSITE
