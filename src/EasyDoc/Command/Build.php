@@ -61,7 +61,7 @@ class Build implements Command
                 ? ['repository' => $this->config['publishPhar']]
                 : $this->config['publishPhar'];
             $publishPhar = new PharPublish($config['repository'], $config['directory'] ?? $websiteDirectory.'/static/');
-            $publishPhar->publishPhar();
+            $publishPhar->publishPhar($this->cli);
         }
 
         $this->cli->build($websiteDirectory, $assetsDirectory, $sourceDir, $baseHref, $this->config['index'] ?? null);

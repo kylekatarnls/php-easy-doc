@@ -2,12 +2,25 @@
 
 namespace EasyDoc\Util;
 
+use SimpleCli\Traits\Output;
+
 class PharPublish extends GitHubApi
 {
-    public function publishPhar()
+    protected function write(string $message, ?Output $output, string $color = null, string $background = null)
+    {
+        if (!$output) {
+            echo $message;
+
+            return;
+        }
+
+        $output->write($message, $color, $background);
+    }
+
+    public function publishPhar(Output $output = null)
     {
         if (!EnvVar::toString('GITHUB_TOKEN')) {
-            echo "PHAR publishing skipped as GITHUB_TOKEN is missing.\n";
+            $this->write("PHAR publishing skipped as GITHUB_TOKEN is missing.\n", $output, 'yellow');
 
             return;
         }
@@ -36,10 +49,10 @@ class PharPublish extends GitHubApi
             $this->download($pharDestinationDirectory.'/phpmd.phar', $pharUrl);
             $filesize = filesize($pharDestinationDirectory.'/phpmd.phar');
 
-            echo $pharDestinationDirectory.'/phpmd.phar downloaded: '.number_format($filesize / 1024 / 1024, 2).' MB';
+            $this->write($pharDestinationDirectory.'/phpmd.phar downloaded: '.number_format($filesize / 1024 / 1024, 2).' MB', $output, 'light_green');
 
             if ($totalPharSize === 0) {
-                echo ' (latest)';
+                $this->write(' (latest)', $output, 'light_green');
                 // the first one is the latest
                 $latestPharDestinationDirectory = $this->downloadDirectory.'latest';
                 @mkdir($latestPharDestinationDirectory, 0777, true);
@@ -47,7 +60,7 @@ class PharPublish extends GitHubApi
                 $totalPharSize += $filesize;
             }
 
-            echo "\n";
+            $this->write("\n", $output, 'light_green');
 
             $totalPharSize += $filesize;
 
