@@ -8,6 +8,9 @@
     <filter>
         <whitelist>
             <directory>src/EasyDoc</directory>
+            <exclude>
+                <file>src/EasyDoc/defaultLayout.php</file>
+            </exclude>
         </whitelist>
     </filter>
 

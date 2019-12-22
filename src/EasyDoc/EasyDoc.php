@@ -12,7 +12,7 @@ class EasyDoc extends SimpleCli
     use Verbose;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $layout;
 
@@ -38,9 +38,9 @@ class EasyDoc extends SimpleCli
     }
 
     /**
-     * @param string $layout
+     * @param string|null $layout
      */
-    public function setLayout(string $layout)
+    public function setLayout(?string $layout)
     {
         $this->layout = $layout;
     }
