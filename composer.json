@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": "^7.1 || ^8.0",
-        "simple-cli/simple-cli": "^1.1"
+        "simple-cli/simple-cli": "^1.4.1"
     },
     "autoload": {
         "psr-4": {
