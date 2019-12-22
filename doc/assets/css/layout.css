@@ -54,6 +54,7 @@ a {
 #content > aside {
     flex: 0;
     min-width: 200px;
+    padding-left: 1em;
 }
 
 #content > aside ul {
@@ -87,11 +88,12 @@ footer {
         margin: 0;
     }
 
-    #content aside {
+    #content > aside {
         width: 100%;
+        padding-left: 0;
     }
 
-    #content article {
+    #content > article {
         width: 100%;
     }
 }
