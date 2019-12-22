@@ -6,7 +6,7 @@ matrix:
     - php: 7.2
     - php: 7.3
     - php: 7.4
-    - php: nigthly
+    - php: nightly
     - php: 7.4
       env: WEBSITE=true
 
@@ -23,10 +23,11 @@ before_script:
   - ./cc-test-reporter before-build
   - composer self-update
   - if [[ $WEBSITE = 'true' ]]; then composer require erusev/parsedown --no-update; fi
-  - composer install
+  - if [[ $TRAVIS_PHP_VERSION = 'nightly' ]]; then composer update --ignore-platform-reqs; fi;
+  - if [[ $TRAVIS_PHP_VERSION != 'nightly' ]]; then composer update; fi;
 
 script:
-  - if [[ $WEBSITE = 'true' ]]; then bin/easy-doc build doc/config.php --verbose; fi
+  - if [[ $WEBSITE = 'true' ]]; then php bin/easy-doc build doc/config.php --verbose; fi
   - if [[ $WEBSITE != 'true' ]]; then vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml; fi
 
 after_script:
