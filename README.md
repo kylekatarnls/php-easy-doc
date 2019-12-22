@@ -1,4 +1,5 @@
-# php-easy-doc
+# Easy-Doc
+
 An easy way to generate a static doc from HTML/Markdown/RST/Pug/anything documentation files
 
 Of course Easy-Doc documentation is generated with Easy-Doc,

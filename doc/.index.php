@@ -11,4 +11,8 @@ return [
         'path' => 'customize/',
         'directory' => true,
     ],
+    [
+        'name' => 'Create a menu',
+        'path' => 'create-a-menu.md',
+    ],
 ];

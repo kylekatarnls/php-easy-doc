@@ -75,6 +75,10 @@ return [
 </html>
 ```
 
+In the example above **css** and **js** are sub-directories of the **assets**
+directory set as `'assetsDirectory'` in the config file. Here you can add any
+library you want such as [prismjs](https://prismjs.com/) to color code examples.
+
 The layout receive 2 variables `$content` and `$menu`. `$menu` contains links
 in `<li></li>` items auto-generated from your documentation source directory
 structure.
