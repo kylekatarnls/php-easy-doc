@@ -1,9 +1,11 @@
 <?php
 
+use EasyDoc\Util\EnvVar;
+
 $parser = new Parsedown();
 
 return [
-    'baseHref' => '/',
+    'baseHref' => EnvVar::toString('BASE_HREF'),
     'index' => 'getting-started.html',
     'websiteDirectory' => __DIR__.'/../dist/website',
     'sourceDirectory' => __DIR__,
