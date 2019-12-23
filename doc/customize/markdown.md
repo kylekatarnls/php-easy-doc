@@ -3,8 +3,10 @@
 Install a Markdown parser, for example:
 
 ```shell
-composer require --dev erusev/parsedown
+composer require erusev/parsedown --dev
 ```
+
+*Use `--dev` only if **easy-doc** itself is installed in the `"require-dev"` of your composer.json*
 
 And add `.md` parsing in the `'extensions'` config:
 

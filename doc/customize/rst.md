@@ -3,8 +3,10 @@
 Install an RST parser, for example:
 
 ```shell
-composer require --dev gregwar/rst
+composer require gregwar/rst --dev
 ```
+
+*Use `--dev` only if **easy-doc** itself is installed in the `"require-dev"` of your composer.json*
 
 And add `.md` parsing in the `'extensions'` config:
 

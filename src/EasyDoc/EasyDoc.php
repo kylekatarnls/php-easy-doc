@@ -69,6 +69,18 @@ class EasyDoc extends SimpleCli
     }
 
     /**
+     * Create a directory or empty it if it exists.
+     *
+     * @param string $websiteDirectory
+     */
+    public function initializeDirectory(string $websiteDirectory): void
+    {
+        $this->info("Initializing $websiteDirectory");
+        $this->removeDirectory($websiteDirectory);
+        @mkdir($websiteDirectory, 0777, true);
+    }
+
+    /**
      * Build the website directory and create HTML files from RST sources.
      *
      * @param string   $websiteDirectory Output directory
@@ -79,19 +91,15 @@ class EasyDoc extends SimpleCli
      *
      * @return void
      */
-    public function build(string $websiteDirectory, string $assetsDirectory, string $sourceDirectory, string $baseHref, string $index = null): void
+    public function build(string $websiteDirectory, ?string $assetsDirectory, ?string $sourceDirectory, string $baseHref, string $index = null): void
     {
-        $this->info("Initializing $websiteDirectory");
-        $this->removeDirectory($websiteDirectory);
-        @mkdir($websiteDirectory, 0777, true);
-
         $this->info('Copying assets from '.var_export($assetsDirectory, true));
-        @is_dir($assetsDirectory)
+        $assetsDirectory && @is_dir($assetsDirectory)
             ? $this->copyDirectory($assetsDirectory, $websiteDirectory)
             : $this->info('assets directory skipped as empty');
 
         $this->writeLine('Building website from '.var_export($sourceDirectory, true), 'light_cyan');
-        @is_dir($sourceDirectory)
+        $sourceDirectory && @is_dir($sourceDirectory)
             ? $this->buildWebsite($sourceDirectory, $websiteDirectory, $sourceDirectory, $baseHref)
             : $this->info('source directory skipped as empty');
 

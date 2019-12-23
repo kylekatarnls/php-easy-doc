@@ -22,7 +22,6 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
   - composer self-update
-  - if [[ $WEBSITE = 'true' ]]; then composer require erusev/parsedown --no-update; fi
   - if [[ $TRAVIS_PHP_VERSION = 'nightly' ]]; then composer update --ignore-platform-reqs; fi;
   - if [[ $TRAVIS_PHP_VERSION != 'nightly' ]]; then composer update; fi;
 

@@ -54,6 +54,7 @@ class Build implements Command
         $this->cli->setLayout($this->config['layout'] ?? "$sourceDir/layout.php");
         $this->cli->setExtensions($this->config['extensions'] ?? []);
         $this->cli->setVerbose($this->verbose);
+        $this->cli->initializeDirectory($websiteDirectory);
 
         if (isset($this->config['publishPhar'])) {
             $config = is_string($this->config['publishPhar'])

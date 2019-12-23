@@ -3,8 +3,10 @@
 Install a Pug parser, for example:
 
 ```shell
-composer require --dev pug-php/pug
+composer require pug-php/pug --dev
 ```
+
+*Use `--dev` only if **easy-doc** itself is installed in the `"require-dev"` of your composer.json*
 
 And add `.md` parsing in the `'extensions'` config:
 

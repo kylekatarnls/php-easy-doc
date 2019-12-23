@@ -36,12 +36,23 @@ class TestCase extends PHPUnitTestCase
         }
     }
 
+    protected function getFileContents(string $path): ?string
+    {
+        $contents = file_get_contents($path);
+
+        if ($contents === false) {
+            return null;
+        }
+
+        return str_replace("\r\n", "\n", $contents);
+    }
+
     protected function getPathImage(string $path = null)
     {
         $path = $path ?: $this->tempDirectory;
 
         if (is_file($path)) {
-            return str_replace("\r\n", "\n", file_get_contents($path));
+            return $this->getFileContents($path);
         }
 
         $image = [];

@@ -1,0 +1,1 @@
+If extension is not set, files are ignored.
