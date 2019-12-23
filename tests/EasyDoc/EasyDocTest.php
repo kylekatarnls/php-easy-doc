@@ -40,16 +40,16 @@ class EasyDocTest extends TestCase
      */
     public function testSetExtensions()
     {
-        $source = realpath(__DIR__.'/../doc/source');
+        $source = realpath(__DIR__.'/../doc/simple-example/source');
         $escapedSource = addslashes($source);
-        $assets = realpath(__DIR__.'/../doc/assets');
+        $assets = realpath(__DIR__.'/../doc/simple-example/assets');
         $escapedAssets = addslashes($assets);
 
         ob_start();
         $doc = new EasyDoc();
         $doc->setVerbose(false);
         $doc->setEscapeCharacter('#');
-        $doc->setLayout(__DIR__.'/../doc/layout.php');
+        $doc->setLayout(__DIR__.'/../doc/simple-example/layout.php');
         $doc->setExtensions([
             'html',
             'php' => 'file_eval',
@@ -104,5 +104,27 @@ class EasyDocTest extends TestCase
             'b.html' => str_replace("<?php echo \$content ?? '' ?>\n", "<?php echo 1 + 2; ?>\n", $layout),
         ]);
         $this->assertSame('', $output);
+
+        $source = realpath(__DIR__.'/../doc/simple-example/source-empty');
+        $assets = realpath(__DIR__.'/../doc/simple-example/assets-empty');
+
+        ob_start();
+        $doc->unmute();
+        $doc->setVerbose(true);
+        $doc->setLayout(__DIR__.'/../doc/simple-example/layout.php');
+        $doc->build($this->tempDirectory, $assets, $source, '/');
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertSame(
+            "#[0;36mInitializing $temp\n".
+            "#[0m#[0;36mCopying assets from ''\n".
+            "#[0m#[0;36massets directory skipped as empty\n".
+            "#[0m#[1;36mBuilding website from ''\n".
+            "#[0m#[0;36msource directory skipped as empty\n".
+            "#[0mBuild finished.\n",
+            $output
+        );
+        $this->assertDirectoryImage([]);
     }
 }
