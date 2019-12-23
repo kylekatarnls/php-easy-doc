@@ -5,6 +5,11 @@
         'path' => 'install.md',
     ],
     [
+        'hidden' => true,
+        'name' => 'To do',
+        'path' => 'to-do.md',
+    ],
+    [
         'directory' => true,
         'name' => 'Plugins',
         'path' => 'plugins/',

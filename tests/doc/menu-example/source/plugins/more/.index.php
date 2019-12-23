@@ -1,19 +1,15 @@
 <?php return [
     [
         'index' => true,
-        'name' => 'List',
+        'name' => 'More',
         'path' => 'index.md',
     ],
     [
-        'name' => 'A',
-        'path' => 'a.md',
+        'name' => 'C',
+        'path' => 'c.md',
     ],
     [
-        'name' => 'B',
-        'path' => 'b.md',
-    ],
-    [
-        'name' => 'More',
-        'path' => 'more/',
+        'name' => 'D',
+        'path' => 'd.md',
     ],
 ];

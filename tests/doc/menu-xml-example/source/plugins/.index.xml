@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index>
+    <site index="true">
+        <name>List</name>
+        <path>index.md</path>
+    </site>
+    <site>
+        <name>A</name>
+        <path>a.md</path>
+    </site>
+    <site>
+        <name>B</name>
+        <path>b.md</path>
+    </site>
+    <site display="false">
+        <name>H</name>
+        <path>h.md</path>
+    </site>
+    <directory>
+        <name>More</name>
+        <path>more/</path>
+    </directory>
+</index>

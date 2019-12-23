@@ -18,6 +18,7 @@
         'path' => 'h.md',
     ],
     [
+        'directory' => true,
         'name' => 'More',
         'path' => 'more/',
     ],

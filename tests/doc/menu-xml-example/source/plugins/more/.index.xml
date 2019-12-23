@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index>
+    <site index="true">
+        <name>More</name>
+        <path>index.md</path>
+    </site>
+    <site>
+        <name>C</name>
+        <path>c.md</path>
+    </site>
+    <site>
+        <name>D</name>
+        <path>d.md</path>
+    </site>
+</index>

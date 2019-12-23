@@ -5,6 +5,7 @@ namespace EasyDoc\Tests;
 use EasyDoc\Command\Build;
 use EasyDoc\EasyDoc;
 use Parsedown;
+use ReflectionMethod;
 
 /**
  * @coversDefaultClass \EasyDoc\EasyDoc
@@ -38,6 +39,20 @@ class EasyDocTest extends TestCase
         $this->assertSame([
             'build' => Build::class,
         ], (new EasyDoc())->getCommands());
+    }
+
+    /**
+     * @covers ::trimExtension
+     */
+    public function testTrimExtension()
+    {
+        $trimExtension = new ReflectionMethod(EasyDoc::class, 'trimExtension');
+        $trimExtension->setAccessible(true);
+        $doc = new EasyDoc();
+
+        $this->assertSame('file', $trimExtension->invoke($doc, 'file.md'));
+        $this->assertSame('test.inc', $trimExtension->invoke($doc, 'test.inc.php'));
+        $this->assertSame('no-extensions', $trimExtension->invoke($doc, 'no-extensions'));
     }
 
     /**
@@ -208,12 +223,12 @@ class EasyDocTest extends TestCase
                     'a.html' => '<section>
     <h1>A</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A"><strong>A</strong></a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A"><strong>A</strong></a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More">More</a></ul></li></aside>
 ',
                     'b.html' => '<section>
     <h1>B</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B"><strong>B</strong></a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B"><strong>B</strong></a><li><a href="/plugins/more/index.html" title="More">More</a></ul></li></aside>
 ',
                     'index.html' => '<section>
     <h1>Plugins</h1>
@@ -223,19 +238,19 @@ class EasyDocTest extends TestCase
 <li><a href="more/">more</a></li>
 </ul></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More">More</a></ul></li></aside>
 ',
                     'more' =>
                         [
                             'c.html' => '<section>
     <h1>C</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More"><strong>More</strong></a></ul></li></aside>
 ',
                             'd.html' => '<section>
     <h1>D</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More"><strong>More</strong></a></ul></li></aside>
 ',
                             'index.html' => '<section>
     <h1>More plugins</h1>
@@ -244,7 +259,7 @@ class EasyDocTest extends TestCase
 <li><a href="d.md">d</a></li>
 </ul></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More"><strong>More</strong></a></ul></li></aside>
 ',
                         ],
                 ],
@@ -271,6 +286,7 @@ class EasyDocTest extends TestCase
     }
 
     /**
+     * @covers ::buildMenu
      * @covers ::buildXmlMenu
      * @covers ::isHidden
      * @covers ::isIndex
@@ -319,12 +335,12 @@ class EasyDocTest extends TestCase
                     'a.html' => '<section>
     <h1>A</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A"><strong>A</strong></a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A"><strong>A</strong></a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More">More</a></ul></li></aside>
 ',
                     'b.html' => '<section>
     <h1>B</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B"><strong>B</strong></a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B"><strong>B</strong></a><li><a href="/plugins/more/index.html" title="More">More</a></ul></li></aside>
 ',
                     'index.html' => '<section>
     <h1>Plugins</h1>
@@ -334,19 +350,19 @@ class EasyDocTest extends TestCase
 <li><a href="more/">more</a></li>
 </ul></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More">More</a></ul></li></aside>
 ',
                     'more' =>
                         [
                             'c.html' => '<section>
     <h1>C</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More"><strong>More</strong></a></ul></li></aside>
 ',
                             'd.html' => '<section>
     <h1>D</h1></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More"><strong>More</strong></a></ul></li></aside>
 ',
                             'index.html' => '<section>
     <h1>More plugins</h1>
@@ -355,7 +371,7 @@ class EasyDocTest extends TestCase
 <li><a href="d.md">d</a></li>
 </ul></section>
 <aside>
-    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/.html" title="More">More</a></ul></li></aside>
+    <li><a href="/install.html" title="Install">Install</a></li><li><a href="/plugins/index.html" title="Plugins"><strong>Plugins</strong></a><ul><li><a href="/plugins/a.html" title="A">A</a><li><a href="/plugins/b.html" title="B">B</a><li><a href="/plugins/more/index.html" title="More"><strong>More</strong></a></ul></li></aside>
 ',
                         ],
                 ],
