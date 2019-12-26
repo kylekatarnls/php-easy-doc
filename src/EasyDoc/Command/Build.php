@@ -75,22 +75,24 @@ class Build implements Command
 
     protected function handleConfigFile()
     {
-        if ($this->configFile) {
-            if (!file_exists($this->configFile)) {
-                if ($this->configFile !== self::DEFAULT_CONFIG_FILE) {
-                    $this->cli->writeLine('Config file not found', 'light_red');
-                    $this->cli->write(strval($this->configFile), 'red');
+        if (!$this->configFile) {
+            return false;
+        }
 
-                    return false;
-                }
+        if (!file_exists($this->configFile)) {
+            if ($this->configFile !== self::DEFAULT_CONFIG_FILE) {
+                $this->cli->writeLine('Config file not found', 'light_red');
+                $this->cli->writeLine(strval($this->configFile), 'red');
 
-                $this->cli->info('Config file not found, fallback to default config.');
-
-                return true;
+                return false;
             }
 
-            $this->config = include $this->configFile;
+            $this->cli->info('Config file not found, fallback to default config.');
+
+            return true;
         }
+
+        $this->config = include $this->configFile;
 
         return true;
     }
