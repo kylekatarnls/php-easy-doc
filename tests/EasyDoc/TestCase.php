@@ -18,8 +18,13 @@ class TestCase extends PHPUnitTestCase
 
     protected function tearDown()
     {
-        if (file_exists($this->tempDirectory)) {
-            $it = new RecursiveDirectoryIterator($this->tempDirectory, FilesystemIterator::SKIP_DOTS);
+        $this->removeDirectory($this->tempDirectory);
+    }
+
+    protected function removeDirectory(string $directory): void
+    {
+        if (file_exists($directory)) {
+            $it = new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS);
             $it = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
 
             foreach ($it as $file) {
@@ -32,7 +37,7 @@ class TestCase extends PHPUnitTestCase
                 unlink($file->getPathname());
             }
 
-            rmdir($this->tempDirectory);
+            rmdir($directory);
         }
     }
 

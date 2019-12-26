@@ -47,8 +47,8 @@ class Build implements Command
         }
 
         $websiteDirectory = $this->config['websiteDirectory'] ?? 'dist/website';
-        $assetsDirectory = $this->config['assetsDirectory'] ?? "$websiteDirectory/assets";
         $sourceDir = $this->config['sourceDirectory'] ?? 'doc';
+        $assetsDirectory = $this->config['assetsDirectory'] ?? "$sourceDir/assets";
         $baseHref = $this->config['baseHref'] ?? '';
 
         $this->cli->setLayout($this->config['layout'] ?? "$sourceDir/layout.php");
