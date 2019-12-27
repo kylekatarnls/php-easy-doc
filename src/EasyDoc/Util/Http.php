@@ -2,6 +2,8 @@
 
 namespace EasyDoc\Util;
 
+use EasyDoc\Exception\HttpException;
+
 class Http
 {
     public function request(string $url, $data = null, bool $withToken = false, string $file = null)
@@ -30,7 +32,7 @@ class Http
             $token = EnvVar::toString('GITHUB_TOKEN');
 
             if (!$token) {
-                throw new RuntimeException('No Github token provided.');
+                throw new HttpException('No Github token provided.');
             }
 
             curl_setopt($curl, CURLOPT_HTTPHEADER, [
@@ -53,7 +55,7 @@ class Http
         }
 
         if ($error !== null) {
-            throw new RuntimeException("$url failed:\n$error");
+            throw new HttpException("$url failed:\n$error");
         }
 
         return $content;
