@@ -24,6 +24,7 @@ class HttpTest extends TestCase
     }
 
     /**
+     * @covers \EasyDoc\Exception\HttpException::<public>
      * @covers ::request
      */
     public function testRequestError()
@@ -52,5 +53,19 @@ class HttpTest extends TestCase
 
         $this->assertFileEquals($sampleFile, $this->tempDirectory.'/dump.txt');
         $this->assertTrue($response);
+    }
+
+    /**
+     * @covers \EasyDoc\Exception\HttpException::<public>
+     * @covers ::request
+     */
+    public function testRequestTokenError()
+    {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('HTTP error: No Github token provided.');
+
+        $http = new Http();
+        $file = str_replace('\\', '/', realpath(__DIR__.'/sample.txt'));
+        $http->request('file://'.(substr($file, 0, 1) === '/' ? '' : '/').$file, null, true);
     }
 }
