@@ -4,9 +4,9 @@ namespace EasyDoc\Util;
 
 use SimpleCli\Writer;
 
-class PharPublish extends GitHubApi
+class PharPublish extends GitHubApi implements PharPublisher
 {
-    protected function write(string $message, ?Writer $output, string $color = null, string $background = null)
+    protected function write(string $message, ?Writer $output, string $color = null, string $background = null): void
     {
         if (!$output) {
             echo $message;
@@ -17,7 +17,7 @@ class PharPublish extends GitHubApi
         $output->write($message, $color, $background);
     }
 
-    public function publishPhar(Writer $output = null)
+    public function publishPhar(Writer $output = null): void
     {
         if (!EnvVar::toString('GITHUB_TOKEN')) {
             $this->write("PHAR publishing skipped as GITHUB_TOKEN is missing.\n", $output, 'yellow');
@@ -27,7 +27,7 @@ class PharPublish extends GitHubApi
 
         // We get the releases from the GitHub API
         $releases = $this->json('releases');
-        $releaseVersions = array_map(static function ($release) {
+        $releaseVersions = array_map(static function ($release): string {
             return $release->tag_name;
         }, $releases);
 
