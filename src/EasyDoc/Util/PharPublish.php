@@ -42,7 +42,7 @@ class PharPublish extends GitHubApi
         $totalPharSize = 0;
 
         // we iterate each version
-        foreach ($releaseVersions as $version) {
+        foreach (array_reverse($releaseVersions) as $version) {
             $pharUrl = 'releases/download/'.$version.'/phpmd.phar';
             $pharDestinationDirectory = $this->downloadDirectory.$version;
             @mkdir($pharDestinationDirectory, 0777, true);
