@@ -10,14 +10,19 @@ use RecursiveIteratorIterator;
 class TestCase extends PHPUnitTestCase
 {
     protected $tempDirectory;
+    protected $githubToken;
 
     protected function setUp()
     {
+        $this->githubToken = getenv('GITHUB_TOKEN');
+        putenv('GITHUB_TOKEN');
+        chdir(__DIR__.'/../..');
         $this->tempDirectory = sys_get_temp_dir().'/doc-'.mt_rand(0, 9999999);
     }
 
     protected function tearDown()
     {
+        $this->githubToken ? putenv('GITHUB_TOKEN='.$this->githubToken) : putenv('GITHUB_TOKEN');
         $this->removeDirectory($this->tempDirectory);
     }
 

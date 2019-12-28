@@ -1,6 +1,6 @@
-.env
-composer.phar
-composer.lock
+/.env
+/composer.phar
+/composer.lock
 /coverage/
 /dist/
 /.idea/

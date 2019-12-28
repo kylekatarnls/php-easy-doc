@@ -4,7 +4,9 @@ namespace EasyDoc\Tests\Util;
 
 use EasyDoc\Exception\HttpException;
 use EasyDoc\Tests\TestCase;
+use EasyDoc\Util\EnvVar;
 use EasyDoc\Util\Http;
+use Symfony\Component\Process\Process;
 
 /**
  * @coversDefaultClass \EasyDoc\Util\Http
@@ -67,5 +69,31 @@ class HttpTest extends TestCase
         $http = new Http();
         $file = str_replace('\\', '/', realpath(__DIR__.'/sample.txt'));
         $http->request('file://'.(substr($file, 0, 1) === '/' ? '' : '/').$file, null, true);
+    }
+
+    /**
+     * @covers ::request
+     */
+    public function testJsonRequest()
+    {
+        chdir(__DIR__);
+        $process = new Process(['php', '-S=localhost:9245', 'server.php']);
+        $process->start();
+
+        usleep(100000);
+
+        EnvVar::reset();
+        ob_start();
+        $http = new Http();
+        $response = $http->request('http://localhost:9245/', ['foo' => 'bar']);
+        ob_end_clean();
+        $process->stop();
+
+        [$headers, $input] = explode("\n", $response);
+        $headers = unserialize($headers);
+
+        $this->assertSame('application/json', $headers['Content-Type']);
+        $this->assertSame('token abc123', $headers['Authorization']);
+        $this->assertSame('{"foo":"bar"}', $input);
     }
 }
