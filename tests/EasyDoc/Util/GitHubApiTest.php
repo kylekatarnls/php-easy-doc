@@ -43,4 +43,32 @@ class GitHubApiTest extends TestCase
         $this->assertSame('token abc123', $response->headers->Authorization);
         $this->assertSame('', $response->input);
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::json
+     * @covers ::apiRequest
+     * @covers ::prefixRequest
+     */
+    public function testJson()
+    {
+        @mkdir($this->tempDirectory, 0777, true);
+        chdir(__DIR__);
+        $process = new Process(['php', '-S=localhost:9245', 'github.php']);
+        $process->start();
+
+        usleep(100000);
+
+        EnvVar::reset();
+        ob_start();
+        $api = new GitHubApi('vendor/library', 'download', 'http://localhost:9245/web/', 'http://localhost:9245/api/');
+        $response = $api->json('suffix');
+        ob_end_clean();
+        $process->stop();
+
+        $this->assertSame('/api/vendor/library/suffix', $response->uri);
+        $this->assertSame('application/json', $response->headers->{'Content-Type'});
+        $this->assertSame('token abc123', $response->headers->Authorization);
+        $this->assertSame('', $response->input);
+    }
 }
