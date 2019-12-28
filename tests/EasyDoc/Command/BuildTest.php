@@ -150,4 +150,33 @@ class BuildTest extends TestCase
         $this->assertSame('vendor/library', FakePharPublisher::$lastPublisher->defaultRepository);
         $this->assertSame('dist/website/static/', FakePharPublisher::$lastPublisher->downloadDirectory);
     }
+
+    /**
+     * @covers ::run
+     */
+    public function testPharPublishSizeLimit()
+    {
+        $temp = $this->tempDirectory.'/temp';
+        @mkdir($temp, 0777, true);
+        chdir($temp);
+        file_put_contents('.easy-doc.php', '<?php return [
+            "pharPublisher" => "\\EasyDoc\\Tests\\FakePharPublisher",
+            "publishPhar" => [
+                "repository" => "vendor/library",
+                "sizeLimit" => 2000,
+            ],
+        ];');
+        $doc = new EasyDoc();
+        $doc->setEscapeCharacter('#');
+        $doc->mute();
+        $build = new Build();
+        $run = $build->run($doc);
+        $this->removeDirectory('doc');
+        unlink('.easy-doc.php');
+
+        $this->assertTrue($run);
+        $this->assertSame($doc, FakePharPublisher::$lastPublisher->output);
+        $this->assertSame('vendor/library', FakePharPublisher::$lastPublisher->defaultRepository);
+        $this->assertSame('dist/website/static/', FakePharPublisher::$lastPublisher->downloadDirectory);
+    }
 }

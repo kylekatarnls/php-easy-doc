@@ -4,7 +4,7 @@ namespace EasyDoc\Util;
 
 use SimpleCli\Writer;
 
-class PharPublish extends GitHubApi implements PharPublisher
+class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter
 {
     /**
      * The total limit of all the phar files, size in bytes.

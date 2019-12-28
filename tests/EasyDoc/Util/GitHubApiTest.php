@@ -5,7 +5,6 @@ namespace EasyDoc\Tests\Util;
 use EasyDoc\Tests\TestCase;
 use EasyDoc\Util\EnvVar;
 use EasyDoc\Util\GitHubApi;
-use Symfony\Component\Process\Process;
 
 /**
  * @coversDefaultClass \EasyDoc\Util\GitHubApi
@@ -22,10 +21,7 @@ class GitHubApiTest extends TestCase
     {
         @mkdir($this->tempDirectory, 0777, true);
         chdir(__DIR__);
-        $process = new Process(['php', '-S=localhost:9245', 'github.php']);
-        $process->start();
-
-        usleep(100000);
+        $process = $this->startServer('github.php');
 
         EnvVar::reset();
         ob_start();
@@ -54,10 +50,7 @@ class GitHubApiTest extends TestCase
     {
         @mkdir($this->tempDirectory, 0777, true);
         chdir(__DIR__);
-        $process = new Process(['php', '-S=localhost:9245', 'github.php']);
-        $process->start();
-
-        usleep(100000);
+        $process = $this->startServer('github.php');
 
         EnvVar::reset();
         ob_start();

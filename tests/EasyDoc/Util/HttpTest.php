@@ -6,7 +6,6 @@ use EasyDoc\Exception\HttpException;
 use EasyDoc\Tests\TestCase;
 use EasyDoc\Util\EnvVar;
 use EasyDoc\Util\Http;
-use Symfony\Component\Process\Process;
 
 /**
  * @coversDefaultClass \EasyDoc\Util\Http
@@ -81,10 +80,7 @@ class HttpTest extends TestCase
     public function testJsonRequest()
     {
         chdir(__DIR__);
-        $process = new Process(['php', '-S=localhost:9245', 'server.php']);
-        $process->start();
-
-        usleep(100000);
+        $process = $this->startServer('server.php');
 
         EnvVar::reset();
         ob_start();

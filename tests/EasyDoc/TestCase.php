@@ -6,6 +6,7 @@ use FilesystemIterator;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Symfony\Component\Process\Process;
 
 class TestCase extends PHPUnitTestCase
 {
@@ -81,5 +82,15 @@ class TestCase extends PHPUnitTestCase
     protected function assertDirectoryImage(array $expectedDirectoryImage, string $message = '')
     {
         return $this->assertSame($expectedDirectoryImage, $this->getPathImage(), $message);
+    }
+
+    protected function startServer(string $server): Process
+    {
+        $process = new Process(['php', '-S=localhost:9245', $server]);
+        $process->start();
+
+        usleep(100000);
+
+        return $process;
     }
 }

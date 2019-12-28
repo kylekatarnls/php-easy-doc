@@ -5,7 +5,6 @@ namespace EasyDoc\Tests\Util;
 use EasyDoc\Tests\TestCase;
 use EasyDoc\Util\EnvVar;
 use EasyDoc\Util\PharPublish;
-use Symfony\Component\Process\Process;
 
 /**
  * @coversDefaultClass \EasyDoc\Util\PharPublish
@@ -47,8 +46,7 @@ class PharPublishTest extends TestCase
     {
         chdir(__DIR__);
         ob_start();
-        $process = new Process(['php', '-S=localhost:9245', 'github.php']);
-        $process->start();
+        $process = $this->startServer('github.php');
         EnvVar::reset();
         EnvVar::toString('GITHUB_TOKEN');
         ob_end_clean();
@@ -84,8 +82,7 @@ class PharPublishTest extends TestCase
     {
         chdir(__DIR__);
         ob_start();
-        $process = new Process(['php', '-S=localhost:9245', 'github.php']);
-        $process->start();
+        $process = $this->startServer('github.php');
         EnvVar::reset();
         EnvVar::toString('GITHUB_TOKEN');
         ob_end_clean();
