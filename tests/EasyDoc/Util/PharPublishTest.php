@@ -73,6 +73,42 @@ class PharPublishTest extends TestCase
                 ],
             ],
         ]);
+    }
 
+    /**
+     * @covers ::getTotalSizeLimit
+     * @covers ::setTotalSizeLimit
+     * @covers ::publishPhar
+     */
+    public function testSizeLimit()
+    {
+        chdir(__DIR__);
+        ob_start();
+        $process = new Process(['php', '-S=localhost:9245', 'github.php']);
+        $process->start();
+        EnvVar::reset();
+        EnvVar::toString('GITHUB_TOKEN');
+        ob_end_clean();
+        $writer = new FakeWriter();
+        $publisher = new PharPublish('vendor/library', $this->tempDirectory.'/download/', 'http://localhost:9245/web/', 'http://localhost:9245/api/');
+        $publisher->setTotalSizeLimit(150);
+        $size = $publisher->getTotalSizeLimit();
+        $publisher->publishPhar($writer);
+        $process->stop();
+
+        $this->assertDirectoryImage([
+            'download' => [
+                '1.0.19' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.0.19/library.phar',
+                ],
+                '1.3.0' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
+                ],
+                'latest' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
+                ],
+            ],
+        ]);
+        $this->assertSame(150, $size);
     }
 }
