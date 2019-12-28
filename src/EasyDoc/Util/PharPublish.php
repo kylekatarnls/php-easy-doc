@@ -17,13 +17,15 @@ class PharPublish extends GitHubApi implements PharPublisher
         $output->write($message, $color, $background);
     }
 
-    public function publishPhar(Writer $output = null): void
+    public function publishPhar(Writer $output = null, string $fileName = null): void
     {
         if (!EnvVar::toString('GITHUB_TOKEN')) {
             $this->write("PHAR publishing skipped as GITHUB_TOKEN is missing.\n", $output, 'yellow');
 
             return;
         }
+
+        $fileName = $fileName ?: preg_replace('/^.*\/([^\/]+)$/', '$1', $this->defaultRepository).'.phar';
 
         // We get the releases from the GitHub API
         $releases = $this->json('releases');
@@ -43,20 +45,20 @@ class PharPublish extends GitHubApi implements PharPublisher
 
         // we iterate each version
         foreach (array_reverse($releaseVersions) as $version) {
-            $pharUrl = 'releases/download/'.$version.'/phpmd.phar';
+            $pharUrl = 'releases/download/'.$version.'/'.$fileName;
             $pharDestinationDirectory = $this->downloadDirectory.$version;
             @mkdir($pharDestinationDirectory, 0777, true);
-            $this->download($pharDestinationDirectory.'/phpmd.phar', $pharUrl);
-            $filesize = filesize($pharDestinationDirectory.'/phpmd.phar');
+            $this->download($pharDestinationDirectory.'/'.$fileName, $pharUrl);
+            $filesize = filesize($pharDestinationDirectory.'/'.$fileName);
 
-            $this->write($pharDestinationDirectory.'/phpmd.phar downloaded: '.number_format($filesize / 1024 / 1024, 2).' MB', $output, 'light_green');
+            $this->write($pharDestinationDirectory.'/'.$fileName.' downloaded: '.number_format($filesize / 1024 / 1024, 2).' MB', $output, 'light_green');
 
             if ($totalPharSize === 0) {
                 $this->write(' (latest)', $output, 'light_green');
                 // the first one is the latest
                 $latestPharDestinationDirectory = $this->downloadDirectory.'latest';
                 @mkdir($latestPharDestinationDirectory, 0777, true);
-                copy($pharDestinationDirectory.'/phpmd.phar', $latestPharDestinationDirectory.'/phpmd.phar');
+                copy($pharDestinationDirectory.'/'.$fileName, $latestPharDestinationDirectory.'/'.$fileName);
                 $totalPharSize += $filesize;
             }
 

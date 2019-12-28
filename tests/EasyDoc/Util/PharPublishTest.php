@@ -5,6 +5,7 @@ namespace EasyDoc\Tests\Util;
 use EasyDoc\Tests\TestCase;
 use EasyDoc\Util\EnvVar;
 use EasyDoc\Util\PharPublish;
+use Symfony\Component\Process\Process;
 
 /**
  * @coversDefaultClass \EasyDoc\Util\PharPublish
@@ -37,5 +38,41 @@ class PharPublishTest extends TestCase
 
         $this->assertSame('', $output);
         $this->assertSame([["PHAR publishing skipped as GITHUB_TOKEN is missing.\n", 'yellow', null]], $writer->output);
+    }
+
+    /**
+     * @covers ::publishPhar
+     */
+    public function testPublishPhar()
+    {
+        chdir(__DIR__);
+        ob_start();
+        $process = new Process(['php', '-S=localhost:9245', 'github.php']);
+        $process->start();
+        EnvVar::reset();
+        EnvVar::toString('GITHUB_TOKEN');
+        ob_end_clean();
+        $writer = new FakeWriter();
+        $publisher = new PharPublish('vendor/library', $this->tempDirectory.'/download/', 'http://localhost:9245/web/', 'http://localhost:9245/api/');
+        $publisher->publishPhar($writer);
+        $process->stop();
+
+        $this->assertDirectoryImage([
+            'download' => [
+                '1.0.0' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.0.0/library.phar',
+                ],
+                '1.0.19' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.0.19/library.phar',
+                ],
+                '1.3.0' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
+                ],
+                'latest' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
+                ],
+            ],
+        ]);
+
     }
 }

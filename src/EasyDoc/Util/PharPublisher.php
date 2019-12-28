@@ -8,5 +8,5 @@ interface PharPublisher
 {
     public function __construct(string $defaultRepository, string $downloadDirectory);
 
-    public function publishPhar(Writer $output = null): void;
+    public function publishPhar(Writer $output = null, string $fileName = null): void;
 }

@@ -34,7 +34,7 @@ class FakePharPublisher implements PharPublisher
         $this->downloadDirectory = $downloadDirectory;
     }
 
-    public function publishPhar(Writer $output = null): void
+    public function publishPhar(Writer $output = null, string $fileName = null): void
     {
         $this->output = $output;
     }

@@ -64,7 +64,7 @@ class Build implements Command
             $pharPublisher = $config['publisher'] ?? $this->config['pharPublisher'] ?? PharPublish::class;
             /** @var PharPublisher $publishPhar */
             $publishPhar = new $pharPublisher($config['repository'], $config['directory'] ?? $websiteDirectory.'/static/');
-            $publishPhar->publishPhar($this->cli);
+            $publishPhar->publishPhar($this->cli, $config['fileName'] ?? null);
             unset($publishPhar);
         }
 
