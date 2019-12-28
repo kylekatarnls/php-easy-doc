@@ -5,6 +5,7 @@ namespace EasyDoc\Tests\Command;
 use EasyDoc\Command\Build;
 use EasyDoc\EasyDoc;
 use EasyDoc\Tests\FakePharPublisher;
+use EasyDoc\Tests\FakePharPublisherWithSizeLimit;
 use EasyDoc\Tests\TestCase;
 
 /**
@@ -175,8 +176,34 @@ class BuildTest extends TestCase
         unlink('.easy-doc.php');
 
         $this->assertTrue($run);
+        $this->assertInstanceOf(FakePharPublisher::class, FakePharPublisher::$lastPublisher);
         $this->assertSame($doc, FakePharPublisher::$lastPublisher->output);
         $this->assertSame('vendor/library', FakePharPublisher::$lastPublisher->defaultRepository);
         $this->assertSame('dist/website/static/', FakePharPublisher::$lastPublisher->downloadDirectory);
+
+        $temp = $this->tempDirectory.'/temp';
+        @mkdir($temp, 0777, true);
+        chdir($temp);
+        file_put_contents('.easy-doc.php', '<?php return [
+            "pharPublisher" => "\\EasyDoc\\Tests\\FakePharPublisherWithSizeLimit",
+            "publishPhar" => [
+                "repository" => "vendor/library",
+                "sizeLimit" => 2000,
+            ],
+        ];');
+        $doc = new EasyDoc();
+        $doc->setEscapeCharacter('#');
+        $doc->mute();
+        $build = new Build();
+        $run = $build->run($doc);
+        $this->removeDirectory('doc');
+        unlink('.easy-doc.php');
+
+        $this->assertTrue($run);
+        $this->assertInstanceOf(FakePharPublisherWithSizeLimit::class, FakePharPublisherWithSizeLimit::$lastPublisher);
+        $this->assertSame(2000, FakePharPublisherWithSizeLimit::$lastPublisher->sizeLimit);
+        $this->assertSame($doc, FakePharPublisherWithSizeLimit::$lastPublisher->output);
+        $this->assertSame('vendor/library', FakePharPublisherWithSizeLimit::$lastPublisher->defaultRepository);
+        $this->assertSame('dist/website/static/', FakePharPublisherWithSizeLimit::$lastPublisher->downloadDirectory);
     }
 }
