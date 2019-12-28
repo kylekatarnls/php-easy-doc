@@ -18,10 +18,26 @@ class GitHubApi extends Http
      */
     protected $downloadDirectory;
 
-    public function __construct(string $defaultRepository, string $downloadDirectory)
+    /**
+     * URL for web requests.
+     *
+     * @var string
+     */
+    protected $webUrl;
+
+    /**
+     * URL for API requests.
+     *
+     * @var string
+     */
+    protected $apiUrl;
+
+    public function __construct(string $defaultRepository, string $downloadDirectory, string $webUrl = 'https://github.com/', string $apiUrl = 'https://api.github.com/repos/')
     {
         $this->defaultRepository = $defaultRepository;
         $this->downloadDirectory = $downloadDirectory;
+        $this->webUrl = $webUrl;
+        $this->apiUrl = $apiUrl;
     }
 
     protected function prefixRequest(string $prefix, string $url, string $repo = null, $data = null, bool $withToken = true, string $file = null)
@@ -33,12 +49,12 @@ class GitHubApi extends Http
 
     protected function webRequest(string $url, string $repo = null, $data = null, bool $withToken = true, string $file = null)
     {
-        return $this->prefixRequest('https://github.com/', $url, $repo, $data, $withToken, $file);
+        return $this->prefixRequest($this->webUrl, $url, $repo, $data, $withToken, $file);
     }
 
     protected function apiRequest(string $url, string $repo = null, $data = null, bool $withToken = true, string $file = null)
     {
-        return $this->prefixRequest('https://api.github.com/repos/', $url, $repo, $data, $withToken, $file);
+        return $this->prefixRequest($this->apiUrl, $url, $repo, $data, $withToken, $file);
     }
 
     public function download(string $file, string $url, string $repo = null, $data = null, bool $withToken = true)

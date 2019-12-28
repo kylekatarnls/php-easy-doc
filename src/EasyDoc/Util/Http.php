@@ -29,7 +29,7 @@ class Http
         }
 
         if ($data !== null || $withToken) {
-            $token = EnvVar::toString('GITHUB_TOKEN');
+            $token = EnvVar::toString(is_string($withToken) ? $withToken : 'GITHUB_TOKEN');
 
             if (!$token) {
                 throw new HttpException('No Github token provided.');

@@ -66,6 +66,10 @@ class HttpTest extends TestCase
         $this->expectException(HttpException::class);
         $this->expectExceptionMessage('HTTP error: No Github token provided.');
 
+        ob_start();
+        EnvVar::reset();
+        EnvVar::toString('GITHUB_TOKEN');
+        ob_end_clean();
         $http = new Http();
         $file = str_replace('\\', '/', realpath(__DIR__.'/sample.txt'));
         $http->request('file://'.(substr($file, 0, 1) === '/' ? '' : '/').$file, null, true);
