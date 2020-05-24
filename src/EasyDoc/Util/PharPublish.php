@@ -98,7 +98,7 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter, SizeC
                 @rmdir($pharDestinationDirectory);
                 $threshold = $this->getHumanSize($this->pharMinimumSize);
                 $this->write(
-                    "$fileName skipped because it's only $fileHumanSize while at least $threshold is expected.",
+                    "$filePath skipped because it's only $fileHumanSize while at least $threshold is expected.\n",
                     $output,
                     'light_red'
                 );
@@ -117,7 +117,7 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter, SizeC
                 $totalPharSize += $fileSize;
             }
 
-            $this->write("\n", $output, 'light_green');
+            $this->write("\n", $output);
 
             $totalPharSize += $fileSize;
 

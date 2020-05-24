@@ -141,17 +141,17 @@ class PharPublishTest extends TestCase
         $this->assertSame(
             [
                 [
-                    'library.phar skipped because it\'s only 69.0 B while at least 200 kB is expected.',
+                    $this->tempDirectory."/download/1.3.0/library.phar skipped because it's only 69.0 B while at least 200 kB is expected.\n",
                     'light_red',
                     null,
                 ],
                 [
-                    'library.phar skipped because it\'s only 70.0 B while at least 200 kB is expected.',
+                    $this->tempDirectory."/download/1.0.19/library.phar skipped because it's only 70.0 B while at least 200 kB is expected.\n",
                     'light_red',
                     null,
                 ],
                 [
-                    'library.phar skipped because it\'s only 69.0 B while at least 200 kB is expected.',
+                    $this->tempDirectory."/download/1.0.0/library.phar skipped because it's only 69.0 B while at least 200 kB is expected.\n",
                     'light_red',
                     null,
                 ],
@@ -186,17 +186,17 @@ class PharPublishTest extends TestCase
         $this->assertSame(
             [
                 [
-                    'library.phar skipped because it\'s only 69.0 B while at least 987,654 TB is expected.',
+                    $this->tempDirectory."/download/1.3.0/library.phar skipped because it's only 69.0 B while at least 987,654 TB is expected.\n",
                     'light_red',
                     null,
                 ],
                 [
-                    'library.phar skipped because it\'s only 70.0 B while at least 987,654 TB is expected.',
+                    $this->tempDirectory."/download/1.0.19/library.phar skipped because it's only 70.0 B while at least 987,654 TB is expected.\n",
                     'light_red',
                     null,
                 ],
                 [
-                    'library.phar skipped because it\'s only 69.0 B while at least 987,654 TB is expected.',
+                    $this->tempDirectory."/download/1.0.0/library.phar skipped because it's only 69.0 B while at least 987,654 TB is expected.\n",
                     'light_red',
                     null,
                 ],
