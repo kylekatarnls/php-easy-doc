@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="Stylesheet" type="text/css" href="/php-easy-doc//css/layout.css" media="screen">
+    <link rel="icon" href="/php-easy-doc//favicon.ico" type="image/x-icon" />
+
+    <title>Easy-Doc</title>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <div class="page">
+
+        <h1>
+            <a href="/php-easy-doc//">Easy-Doc</a>
+        </h1>
+
+        <div id="content">
+            <article>
+                <h1>Customize</h1>
+<p>The <code>build</code> command can take a config file as argument:</p>
+<pre><code class="language-shell">vendor/bin/easy-doc build doc/config.php</code></pre>
+<p>If not specified, it will try to load <strong>.easy-doc.php</strong> from the current
+directory. If none exist, it will simply fallback to default settings.</p>
+<p>The config file must be a PHP file returning custom settings as an array:</p>
+<pre><code class="language-php">&lt;?php
+
+return [
+    // Specify a PHP template to use to render pages
+    'layout' =&gt; __DIR__.'/layout.php',
+
+    // Specify the $baseHref variable the layout.php will receive
+    'baseHref' =&gt; '/',
+
+    // A page to copy to index.html
+    'index' =&gt; 'getting-started.html', 
+
+    // Where to output the generated website
+    'websiteDirectory' =&gt; __DIR__.'/dist/website',
+
+    // Directory containing documentation source files
+    'sourceDirectory' =&gt; __DIR__.'/doc',
+
+    // Directory containing CSS, JS, images and other assets
+    'assetsDirectory' =&gt; __DIR__.'/assets',
+];</code></pre>
+<p><strong>layout.php</strong> would look like:</p>
+<pre><code class="language-php">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;link rel="Stylesheet" type="text/css" href="&lt;?php echo $baseHref ?? ''; ?&gt;/css/layout.css" media="screen"&gt;
+    &lt;title&gt;My library&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h1&gt;
+    &lt;a href="&lt;?php echo $baseHref ?? ''; ?&gt;/"&gt;My library&lt;/a&gt;
+&lt;/h1&gt;
+
+&lt;div id="content"&gt;
+    &lt;?php
+
+    echo $content ?? '';
+
+    ?&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+    &lt;?php
+
+    echo $menu ?? '';
+
+    ?&gt;
+&lt;/ul&gt;
+
+&lt;footer&gt;
+    My license
+&lt;/footer&gt;
+
+&lt;script src="&lt;?php echo $baseHref ?? ''; ?&gt;/js/layout.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p>In the example above <strong>css</strong> and <strong>js</strong> are sub-directories of the <strong>assets</strong>
+directory set as <code>'assetsDirectory'</code> in the config file. Here you can add any
+library you want such as <a href="https://prismjs.com/">prismjs</a> to color code examples.</p>
+<p>The layout receive 2 variables <code>$content</code> and <code>$menu</code>. <code>$menu</code> contains links
+in <code>&lt;li&gt;&lt;/li&gt;</code> items auto-generated from your documentation source directory
+structure.</p>
+<p>And <code>$content</code> is the current page content.</p>
+<p>By default you can use HTML to create documentation pages, for instance
+a <strong>getting-started.html</strong> page with:</p>
+<pre><code class="language-html">&lt;h1&gt;Getting started&lt;/h1&gt;
+
+&lt;pre&gt;composer install my-vendor/my-super-library&lt;/pre&gt;</code></pre>
+<p>And you can specify a transformation/rendering/parsing for each file
+extension of your documentation pages in your PHP config file:</p>
+<pre><code class="language-php">&lt;?php
+
+return [
+    'index' =&gt; '/',
+    'websiteDirectory' =&gt; __DIR__.'/../dist/website',
+    'sourceDirectory' =&gt; __DIR__,
+    'assetsDirectory' =&gt; __DIR__.'/assets',
+    'layout' =&gt; __DIR__.'/layout.php',
+    'extensions' =&gt; [
+        'html' =&gt; function ($file) {
+            return strtr(file_get_contents($file), [
+                'my-vendor' =&gt; 'phpmd',
+                'my-super-library' =&gt; 'phpmd',
+            ]);
+        },
+    ],
+];</code></pre>
+<p>So you can basically use any renderer and custom transformations.</p>
+<p>Here are some examples of parser implementations:</p>
+<ul>
+<li><a href="markdown.html">Markdown</a></li>
+<li><a href="rst.html">RST</a></li>
+<li><a href="pug.html">Pug</a></li>
+</ul>            </article>
+
+            <aside>
+                <ul>
+                    <li><a href="/php-easy-doc//getting-started.html" title="Getting started">Getting started</a></li><li><a href="/php-easy-doc//customize/index.html" title="Customize"><strong>Customize</strong></a><ul><li><a href="/php-easy-doc//customize/markdown.html" title="Markdown">Markdown</a><li><a href="/php-easy-doc//customize/rst.html" title="RST">RST</a><li><a href="/php-easy-doc//customize/pug.html" title="Pug">Pug</a></ul></li><li><a href="/php-easy-doc//create-a-menu.html" title="Create a menu">Create a menu</a></li>                </ul>
+            </aside>
+        </div>
+
+    </div>
+
+    <footer>
+        <a href="https://github.com/kylekatarnls/php-easy-doc">GitHub</a>
+        |
+        <a href="https://github.com/kylekatarnls/php-easy-doc/blob/master/LICENSE">MIT License</a>
+    </footer>
+</div>
+
+<script src="/php-easy-doc//js/layout.js"></script>
+</body>
+</html>

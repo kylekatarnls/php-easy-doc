@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="Stylesheet" type="text/css" href="/php-easy-doc//css/layout.css" media="screen">
+    <link rel="icon" href="/php-easy-doc//favicon.ico" type="image/x-icon" />
+
+    <title>Easy-Doc</title>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <div class="page">
+
+        <h1>
+            <a href="/php-easy-doc//">Easy-Doc</a>
+        </h1>
+
+        <div id="content">
+            <article>
+                <h1>Markdown</h1>
+<p>Install a Markdown parser, for example:</p>
+<pre><code class="language-shell">composer require erusev/parsedown --dev</code></pre>
+<p><em>Use <code>--dev</code> only if <strong>easy-doc</strong> itself is installed in the <code>"require-dev"</code> of your composer.json</em></p>
+<p>And add <code>.md</code> parsing in the <code>'extensions'</code> config:</p>
+<pre><code class="language-php">&lt;?php
+
+$parser = new Parsedown();
+
+return [
+    'index' =&gt; '/',
+    'websiteDirectory' =&gt; __DIR__.'/../dist/website',
+    'sourceDirectory' =&gt; __DIR__,
+    'assetsDirectory' =&gt; __DIR__.'/assets',
+    'layout' =&gt; __DIR__.'/layout.php',
+    'extensions' =&gt; [
+        'md' =&gt; function ($file) use ($parser) {
+            return $parser-&gt;text(file_get_contents($file));
+        },
+    ],
+];</code></pre>            </article>
+
+            <aside>
+                <ul>
+                    <li><a href="/php-easy-doc//getting-started.html" title="Getting started">Getting started</a></li><li><a href="/php-easy-doc//customize/index.html" title="Customize"><strong>Customize</strong></a><ul><li><a href="/php-easy-doc//customize/markdown.html" title="Markdown"><strong>Markdown</strong></a><li><a href="/php-easy-doc//customize/rst.html" title="RST">RST</a><li><a href="/php-easy-doc//customize/pug.html" title="Pug">Pug</a></ul></li><li><a href="/php-easy-doc//create-a-menu.html" title="Create a menu">Create a menu</a></li>                </ul>
+            </aside>
+        </div>
+
+    </div>
+
+    <footer>
+        <a href="https://github.com/kylekatarnls/php-easy-doc">GitHub</a>
+        |
+        <a href="https://github.com/kylekatarnls/php-easy-doc/blob/master/LICENSE">MIT License</a>
+    </footer>
+</div>
+
+<script src="/php-easy-doc//js/layout.js"></script>
+</body>
+</html>

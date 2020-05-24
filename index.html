@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="Stylesheet" type="text/css" href="/php-easy-doc//css/layout.css" media="screen">
+    <link rel="icon" href="/php-easy-doc//favicon.ico" type="image/x-icon" />
+
+    <title>Easy-Doc</title>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <div class="page">
+
+        <h1>
+            <a href="/php-easy-doc//">Easy-Doc</a>
+        </h1>
+
+        <div id="content">
+            <article>
+                <h1>Getting started</h1>
+<p>Easy-Doc is an easy way to generate a static doc from
+HTML/Markdown/RST/Pug/anything documentation files.</p>
+<h2>Install</h2>
+<pre><code class="language-shell">composer require easy-doc/easy-doc --dev</code></pre>
+<p>Remove <code>--dev</code> if you need to deploy the documentation bundled with the main project or
+if the project only contains documentation (the same goes for libraries you may install
+in Easy-Doc).</p>
+<p>Note than <code>easy-doc</code> requires at least PHP 7.1. To allow to use it in a project with a lower
+PHP level, you can use edit your <strong>composer.json</strong> file and set <code>"easy-doc/easy-doc": "0.0.0 || ^1"</code>
+and run:</p>
+<pre><code class="language-shell">composer update</code></pre>
+<p>So it will install the version <code>0.0.0</code> if PHP &lt; 7.1 but it will not prevent you to install it
+and use it as soon as the machine running the command use PHP &gt;= 7.1.</p>
+<h2>Usage</h2>
+<p>Create your website file page contents in a folder of your project <code>doc</code> by default:</p>
+<p>Example:</p>
+<p><strong>doc/index.html</strong></p>
+<pre><code class="language-html">&lt;p&gt;
+    Super library make everything super.
+    &lt;a href="example.html"&gt;See the example&lt;/a&gt;
+&lt;/p&gt;</code></pre>
+<p><strong>doc/example.html</strong></p>
+<pre><code class="language-html">&lt;pre&gt;
+$superLibrary = new SuperLibrary();
+
+$superThing = $superLibrary-&gt;enhance($thing);
+&lt;/pre&gt;</code></pre>
+<p>And run the <code>easy-doc</code> command:</p>
+<pre><code class="language-shell">vendor/bin/easy-doc build</code></pre>
+<p>Now you can <a href="customize/">check out how to customize your website</a></p>            </article>
+
+            <aside>
+                <ul>
+                    <li><a href="/php-easy-doc//getting-started.html" title="Getting started"><strong>Getting started</strong></a></li><li><a href="/php-easy-doc//customize/index.html" title="Customize">Customize</a></li><li><a href="/php-easy-doc//create-a-menu.html" title="Create a menu">Create a menu</a></li>                </ul>
+            </aside>
+        </div>
+
+    </div>
+
+    <footer>
+        <a href="https://github.com/kylekatarnls/php-easy-doc">GitHub</a>
+        |
+        <a href="https://github.com/kylekatarnls/php-easy-doc/blob/master/LICENSE">MIT License</a>
+    </footer>
+</div>
+
+<script src="/php-easy-doc//js/layout.js"></script>
+</body>
+</html>
