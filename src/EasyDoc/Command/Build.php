@@ -5,6 +5,7 @@ namespace EasyDoc\Command;
 use EasyDoc\EasyDoc;
 use EasyDoc\Util\PharPublish;
 use EasyDoc\Util\PharPublisher;
+use EasyDoc\Util\SizeChecker;
 use EasyDoc\Util\SizeLimiter;
 use SimpleCli\Command;
 use SimpleCli\Options\Help;
@@ -68,6 +69,10 @@ class Build implements Command
 
             if (isset($config['sizeLimit']) && $publishPhar instanceof SizeLimiter) {
                 $publishPhar->setTotalSizeLimit($config['sizeLimit']);
+            }
+
+            if (isset($config['pharMinimumSize']) && $publishPhar instanceof SizeChecker) {
+                $publishPhar->setPharMinimumSize($config['pharMinimumSize']);
             }
 
             $publishPhar->publishPhar($this->cli, $config['fileName'] ?? null);

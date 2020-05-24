@@ -4,7 +4,7 @@ namespace EasyDoc\Util;
 
 use SimpleCli\Writer;
 
-class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter
+class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter, SizeChecker
 {
     /**
      * The total limit of all the phar files, size in bytes.
@@ -12,7 +12,14 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter
      *
      * @var int
      */
-    protected $totalSizeLimit = 94371840;
+    protected $totalSizeLimit = SizeLimiter::DEFAULT_MAXIMUM_SIZE;
+
+    /**
+     * The minimum size in bytes a PHAR file must have to be stored.
+     *
+     * @var int
+     */
+    protected $pharMinimumSize = SizeChecker::DEFAULT_MINIMUM_PHAR_SIZE;
 
     /**
      * Get the total limit of all the phar files, size in bytes.
@@ -34,15 +41,24 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter
         $this->totalSizeLimit = $totalSizeLimit;
     }
 
-    protected function write(string $message, ?Writer $output, string $color = null, string $background = null): void
+    /**
+     * Get the minimum size in bytes a PHAR file must have to be stored.
+     *
+     * @return int
+     */
+    public function getPharMinimumSize(): int
     {
-        if (!$output) {
-            echo $message;
+        return $this->pharMinimumSize;
+    }
 
-            return;
-        }
-
-        $output->write($message, $color, $background);
+    /**
+     * Set the minimum size in bytes a PHAR file must have to be stored.
+     *
+     * @param int $totalSizeLimit
+     */
+    public function setPharMinimumSize(int $pharMinimumSize): void
+    {
+        $this->pharMinimumSize = $pharMinimumSize;
     }
 
     public function publishPhar(Writer $output = null, string $fileName = null): void
@@ -72,10 +88,25 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter
             $pharUrl = 'releases/download/'.$version.'/'.$fileName;
             $pharDestinationDirectory = $this->downloadDirectory.$version;
             @mkdir($pharDestinationDirectory, 0777, true);
-            $this->download($pharDestinationDirectory.'/'.$fileName, $pharUrl);
-            $filesize = filesize($pharDestinationDirectory.'/'.$fileName);
+            $filePath = $pharDestinationDirectory.'/'.$fileName;
+            $this->download($filePath, $pharUrl);
+            $fileSize = filesize($filePath);
+            $fileHumanSize = $this->getHumanSize($fileSize);
 
-            $this->write($pharDestinationDirectory.'/'.$fileName.' downloaded: '.number_format($filesize / 1024 / 1024, 2).' MB', $output, 'light_green');
+            if ($fileSize < $this->pharMinimumSize) {
+                @unlink($filePath);
+                @rmdir($pharDestinationDirectory);
+                $threshold = $this->getHumanSize($this->pharMinimumSize);
+                $this->write(
+                    "$fileName skipped because it's only $fileHumanSize while at least $threshold is expected.",
+                    $output,
+                    'light_red'
+                );
+
+                continue;
+            }
+
+            $this->write($filePath.' downloaded: '.$fileHumanSize, $output, 'light_green');
 
             if ($totalPharSize === 0) {
                 $this->write(' (latest)', $output, 'light_green');
@@ -83,17 +114,46 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter
                 $latestPharDestinationDirectory = $this->downloadDirectory.'latest';
                 @mkdir($latestPharDestinationDirectory, 0777, true);
                 copy($pharDestinationDirectory.'/'.$fileName, $latestPharDestinationDirectory.'/'.$fileName);
-                $totalPharSize += $filesize;
+                $totalPharSize += $fileSize;
             }
 
             $this->write("\n", $output, 'light_green');
 
-            $totalPharSize += $filesize;
+            $totalPharSize += $fileSize;
 
             if ($totalPharSize > $this->totalSizeLimit) {
                 // we have reached the limit
                 break;
             }
         }
+    }
+
+    protected function write(string $message, ?Writer $output, string $color = null, string $background = null): void
+    {
+        if (!$output) {
+            echo $message;
+
+            return;
+        }
+
+        $output->write($message, $color, $background);
+    }
+
+    protected function getHumanSize(float $size): string
+    {
+        foreach (['', 'k', 'M', 'G'] as $prefix) {
+            if ($size < 1024) {
+                return $this->formatNumber($size).' '.$prefix.'B';
+            }
+
+            $size /= 1024;
+        }
+
+        return $this->formatNumber($size).' TB';
+    }
+
+    protected function formatNumber(float $number): string
+    {
+        return number_format($number, max(0, min(2, 2 - floor(log10($number)))));
     }
 }

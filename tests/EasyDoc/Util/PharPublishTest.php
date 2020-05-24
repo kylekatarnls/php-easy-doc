@@ -52,6 +52,7 @@ class PharPublishTest extends TestCase
         ob_end_clean();
         $writer = new FakeWriter();
         $publisher = new PharPublish('vendor/library', $this->tempDirectory.'/download/', 'http://localhost:9245/web/', 'http://localhost:9245/api/');
+        $publisher->setPharMinimumSize(0);
         $publisher->publishPhar($writer);
         $process->stop();
 
@@ -89,6 +90,7 @@ class PharPublishTest extends TestCase
         $writer = new FakeWriter();
         $publisher = new PharPublish('vendor/library', $this->tempDirectory.'/download/', 'http://localhost:9245/web/', 'http://localhost:9245/api/');
         $publisher->setTotalSizeLimit(150);
+        $publisher->setPharMinimumSize(0);
         $size = $publisher->getTotalSizeLimit();
         $publisher->publishPhar($writer);
         $process->stop();
@@ -107,5 +109,99 @@ class PharPublishTest extends TestCase
             ],
         ]);
         $this->assertSame(150, $size);
+    }
+
+    /**
+     * @covers ::publishPhar
+     * @covers ::setPharMinimumSize
+     * @covers ::getPharMinimumSize
+     * @covers ::getHumanSize
+     * @covers ::formatNumber
+     */
+    public function testMinimumSize()
+    {
+        chdir(__DIR__);
+        ob_start();
+        $process = $this->startServer('github.php');
+        EnvVar::reset();
+        EnvVar::toString('GITHUB_TOKEN');
+        ob_end_clean();
+        $writer = new FakeWriter();
+        $publisher = new PharPublish('vendor/library', $this->tempDirectory.'/download/', 'http://localhost:9245/web/', 'http://localhost:9245/api/');
+        $publisher->setPharMinimumSize(204800);
+        $size = $publisher->getPharMinimumSize();
+        $publisher->publishPhar($writer);
+        $process->stop();
+
+        $this->assertDirectoryImage([
+            'download' => [],
+        ]);
+        $this->assertSame(204800, $size);
+
+        $this->assertSame(
+            [
+                [
+                    'library.phar skipped because it\'s only 69.0 B while at least 200 kB is expected.',
+                    'light_red',
+                    null,
+                ],
+                [
+                    'library.phar skipped because it\'s only 70.0 B while at least 200 kB is expected.',
+                    'light_red',
+                    null,
+                ],
+                [
+                    'library.phar skipped because it\'s only 69.0 B while at least 200 kB is expected.',
+                    'light_red',
+                    null,
+                ],
+            ],
+            $writer->output
+        );
+    }
+
+    /**
+     * @covers ::getHumanSize
+     */
+    public function testVeryBigMinimumSize()
+    {
+        chdir(__DIR__);
+        ob_start();
+        $process = $this->startServer('github.php');
+        EnvVar::reset();
+        EnvVar::toString('GITHUB_TOKEN');
+        ob_end_clean();
+        $writer = new FakeWriter();
+        $publisher = new PharPublish('vendor/library', $this->tempDirectory.'/download/', 'http://localhost:9245/web/', 'http://localhost:9245/api/');
+        $publisher->setPharMinimumSize(1024 * 1024 * 1024 * 1024 * 987654);
+        $size = $publisher->getPharMinimumSize();
+        $publisher->publishPhar($writer);
+        $process->stop();
+
+        $this->assertDirectoryImage([
+            'download' => [],
+        ]);
+        $this->assertSame(1024 * 1024 * 1024 * 1024 * 987654, $size);
+
+        $this->assertSame(
+            [
+                [
+                    'library.phar skipped because it\'s only 69.0 B while at least 987,654 TB is expected.',
+                    'light_red',
+                    null,
+                ],
+                [
+                    'library.phar skipped because it\'s only 70.0 B while at least 987,654 TB is expected.',
+                    'light_red',
+                    null,
+                ],
+                [
+                    'library.phar skipped because it\'s only 69.0 B while at least 987,654 TB is expected.',
+                    'light_red',
+                    null,
+                ],
+            ],
+            $writer->output
+        );
     }
 }
