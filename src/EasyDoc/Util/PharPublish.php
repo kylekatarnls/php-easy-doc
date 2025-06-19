@@ -73,6 +73,7 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter, SizeC
 
         // We get the releases from the GitHub API
         $releases = $this->json('releases');
+
         $releaseVersions = array_map(static function ($release): string {
             return $release->tag_name;
         }, $releases);
@@ -81,7 +82,8 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter, SizeC
         usort($releaseVersions, 'version_compare');
 
         // A counter for the total size for all the downloaded phar files.
-        $totalPharSize = 0;
+        // we first download the latest version
+        $totalPharSize = $this->publishLatestVersion($releases, $fileName, $output);
 
         // we iterate each version
         foreach (array_reverse($releaseVersions) as $version) {
@@ -107,15 +109,6 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter, SizeC
             }
 
             $this->write($filePath.' downloaded: '.$fileHumanSize, $output, 'light_green');
-
-            if ($totalPharSize === 0) {
-                $this->write(' (latest)', $output, 'light_green');
-                // the first one is the latest
-                $latestPharDestinationDirectory = $this->downloadDirectory.'latest';
-                @mkdir($latestPharDestinationDirectory, 0777, true);
-                copy($pharDestinationDirectory.'/'.$fileName, $latestPharDestinationDirectory.'/'.$fileName);
-                $totalPharSize += $fileSize;
-            }
 
             $this->write("\n", $output);
 
@@ -155,5 +148,54 @@ class PharPublish extends GitHubApi implements PharPublisher, SizeLimiter, SizeC
     protected function formatNumber(float $number): string
     {
         return number_format($number, max(0, min(2, 2 - floor(log10($number)))));
+    }
+
+    /**
+     * Publish the latest stable version, this will filter out all draft and prerelease versions.
+     *
+     * @param $releases
+     * @param string $fileName
+     * @param Writer|null $output
+     *
+     * @return int
+     */
+    private function publishLatestVersion($releases, string $fileName, ?Writer $output): int
+    {
+        // we filter out the draft and prereleases
+        $stableReleases = array_filter($releases, static function ($release) {
+            if (isset($release->draft) && $release->draft) {
+                return false;
+            }
+            if (isset($release->prerelease) && $release->prerelease) {
+                return false;
+            }
+            return true;
+        });
+        $stableReleases = array_map(static function ($release): string {
+            return $release->tag_name;
+        }, $stableReleases);
+
+        usort($stableReleases, 'version_compare');
+
+        $latestStableReleaseVersion = end($stableReleases);
+
+        $pharUrl = 'releases/download/' . $latestStableReleaseVersion . '/' . $fileName;
+
+        $latestPharDestinationDirectory = $this->downloadDirectory . 'latest';
+        @mkdir($latestPharDestinationDirectory, 0777, true);
+
+        $filePath = $latestPharDestinationDirectory . '/' . $fileName;
+        $this->download($filePath, $pharUrl);
+        $fileSize = filesize($filePath);
+
+        if ($fileSize < $this->pharMinimumSize) {
+            // this file is to small
+            @unlink($filePath);
+            @rmdir($latestPharDestinationDirectory);
+            return 0;
+        }
+        $this->write(' (latest)', $output, 'light_green');
+
+        return $fileSize;
     }
 }
