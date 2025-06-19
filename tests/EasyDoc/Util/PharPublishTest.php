@@ -67,6 +67,12 @@ class PharPublishTest extends TestCase
                 '1.3.0' => [
                     'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
                 ],
+                '1.4.0' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.4.0/library.phar',
+                ],
+                '1.4.1' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.4.1/library.phar',
+                ],
                 'latest' => [
                     'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
                 ],
@@ -97,11 +103,11 @@ class PharPublishTest extends TestCase
 
         $this->assertDirectoryImage([
             'download' => [
-                '1.0.19' => [
-                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.0.19/library.phar',
+                '1.4.0' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.4.0/library.phar',
                 ],
-                '1.3.0' => [
-                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
+                '1.4.1' => [
+                    'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.4.1/library.phar',
                 ],
                 'latest' => [
                     'library.phar' => 'PHAR SAMPLE: /web/vendor/library/releases/download/1.3.0/library.phar',
@@ -140,6 +146,16 @@ class PharPublishTest extends TestCase
 
         $this->assertSame(
             [
+                [
+                    $this->tempDirectory."/download/1.4.1/library.phar skipped because it's only 69.0 B while at least 200 kB is expected.\n",
+                    'light_red',
+                    null,
+                ],
+                [
+                    $this->tempDirectory."/download/1.4.0/library.phar skipped because it's only 69.0 B while at least 200 kB is expected.\n",
+                    'light_red',
+                    null,
+                ],
                 [
                     $this->tempDirectory."/download/1.3.0/library.phar skipped because it's only 69.0 B while at least 200 kB is expected.\n",
                     'light_red',
@@ -185,6 +201,16 @@ class PharPublishTest extends TestCase
 
         $this->assertSame(
             [
+                [
+                    $this->tempDirectory."/download/1.4.1/library.phar skipped because it's only 69.0 B while at least 987,654 TB is expected.\n",
+                    'light_red',
+                    null,
+                ],
+                [
+                    $this->tempDirectory."/download/1.4.0/library.phar skipped because it's only 69.0 B while at least 987,654 TB is expected.\n",
+                    'light_red',
+                    null,
+                ],
                 [
                     $this->tempDirectory."/download/1.3.0/library.phar skipped because it's only 69.0 B while at least 987,654 TB is expected.\n",
                     'light_red',
